@@ -7,10 +7,11 @@ import net.ccbluex.liquidbounce.features.module.Module
 
 object ModuleKeepAlive : Module("KeepAlive", Category.PLAYER) {
 
+    val health by float("health", 0.5f, 1.0f..0.0f)
     var oneTime = false
 
     val healthUpdateHandler = handler<HealthUpdateEvent> { event ->
-        if (event.health <= 0.1) {
+        if (event.health <= health) {
             if (oneTime) {
                 return@handler
             }
