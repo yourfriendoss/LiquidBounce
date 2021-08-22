@@ -10,7 +10,7 @@ object ModuleKeepAlive : Module("KeepAlive", Category.PLAYER) {
     var oneTime = false
 
     val healthUpdateHandler = handler<HealthUpdateEvent> { event ->
-        if (event.health <= 0) {
+        if (event.health <= 0.1) {
             if (oneTime) {
                 return@handler
             }
