@@ -54,7 +54,7 @@ class ChunkUnloadEvent(val x: Int, val z: Int) : Event()
 class WorldDisconnectEvent : Event()
 
 @Nameable("healthUpdateEvent")
-class HealthUpdateEvent(packetHealth: Float, food: Int, health: Float) : Event()
+class HealthUpdateEvent(val health: Float, val food: Int, val saturation: Float) : Event()
 
 @Nameable("gameRender")
 class GameRenderEvent : Event()
