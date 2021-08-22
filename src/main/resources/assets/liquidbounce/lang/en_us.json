@@ -153,7 +153,8 @@
   "liquidbounce.command.skull.result.skullGiven": "Gave you the skull of %s.",
 
   "liquidbounce.command.position.description": "Copies your current coordinates to the clipboard.",
-  "liquidbounce.command.position.result.position": "Position: %s",
+  "liquidbounce.command.position.result.playerPosition": "Your position: %s",
+  "liquidbounce.command.position.result.otherPlayerPosition": "%s Position: %s",
 
   "liquidbounce.command.username.description": "Copies your username to the clipboard.",
   "liquidbounce.command.username.result.username": "Username: %s",

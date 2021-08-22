@@ -20,6 +20,7 @@ package net.ccbluex.liquidbounce.features.command.commands.utility
 
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.command.builder.CommandBuilder
+import net.ccbluex.liquidbounce.features.command.builder.ParameterBuilder
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.regular
@@ -32,10 +33,28 @@ object CommandPosition {
         return CommandBuilder
             .begin("position")
             .alias("pos")
-            .handler { command, _ ->
-                val position = mc.player!!.blockPos.toShortString()
-                chat(regular(command.result("position", variable(position))))
-                GLFW.glfwSetClipboardString(mc.window.handle, position)
+            .parameter(
+                ParameterBuilder
+                    .begin<String>("name")
+                    .verifiedBy(ParameterBuilder.STRING_VALIDATOR)
+                    .useMinecraftAutoCompletion()
+                    .optional()
+                    .build()
+            )
+            .handler { command, args ->
+                val name = args[0] as String
+                var position: CharSequence
+                for (entity in mc.world!!.entities) {
+                    if (name.equals(entity.entityName, true)) {
+                        position = entity.blockPos.toShortString()
+                        chat(regular(command.result("otherPlayerPosition", entity.entityName, variable(position))))
+                        GLFW.glfwSetClipboardString(mc.window.handle, position)
+                    } else if (!name.equals(entity.entityName, true) || name.isEmpty()){
+                        position = mc.player!!.blockPos.toShortString()
+                        chat(regular(command.result("position", variable(position))))
+                        GLFW.glfwSetClipboardString(mc.window.handle, position)
+                    }
+                }
             }
             .build()
     }
