@@ -43,16 +43,19 @@ object CommandPosition {
             )
             .handler { command, args ->
                 val name = args[0] as String
-                var position: CharSequence
-                for (entity in mc.world!!.entities) {
-                    if (name.equals(entity.entityName, true)) {
-                        position = entity.blockPos.toShortString()
-                        chat(regular(command.result("otherPlayerPosition", entity.entityName, variable(position))))
-                        GLFW.glfwSetClipboardString(mc.window.handle, position)
-                    }else if(name.isEmpty()){
-                        position = mc.player!!.blockPos.toShortString()
-                        chat(regular(command.result("playerPosition", variable(position))))
-                        GLFW.glfwSetClipboardString(mc.window.handle, position)
+                var position: String
+
+                if (name.isEmpty()) {
+                    position = mc.player!!.blockPos.toShortString()
+                    chat(regular(command.result("playerPosition", variable(position))))
+                    GLFW.glfwSetClipboardString(mc.window.handle, position)
+                } else {
+                    for (entity in mc.world!!.entities) {
+                        if (name.equals(entity.entityName, true)) {
+                            position = entity.blockPos.toShortString()
+                            chat(regular(command.result("otherPlayerPosition", entity.entityName, variable(position))))
+                            GLFW.glfwSetClipboardString(mc.window.handle, position)
+                        }
                     }
                 }
             }
