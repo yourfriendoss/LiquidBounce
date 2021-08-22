@@ -49,9 +49,9 @@ object CommandPosition {
                         position = entity.blockPos.toShortString()
                         chat(regular(command.result("otherPlayerPosition", entity.entityName, variable(position))))
                         GLFW.glfwSetClipboardString(mc.window.handle, position)
-                    } else if (!name.equals(entity.entityName, true) || name.isEmpty()){
+                    }else if(name.isEmpty()){
                         position = mc.player!!.blockPos.toShortString()
-                        chat(regular(command.result("position", variable(position))))
+                        chat(regular(command.result("playerPosition", variable(position))))
                         GLFW.glfwSetClipboardString(mc.window.handle, position)
                     }
                 }
