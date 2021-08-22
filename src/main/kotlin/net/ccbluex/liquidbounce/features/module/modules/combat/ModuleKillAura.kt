@@ -231,18 +231,6 @@ object ModuleKillAura : Module("KillAura", Category.COMBAT) {
                 targetTracker.lock(raycastedEntity)
             }
 
-            val blocking = player.isBlocking
-
-            if (blocking) {
-                network.sendPacket(
-                    PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
-                        BlockPos.ORIGIN,
-                        Direction.DOWN
-                    )
-                )
-            }
-
             // Attack enemy according to cps and cooldown
             cpsTimer.tick(
                 click = {
@@ -257,10 +245,6 @@ object ModuleKillAura : Module("KillAura", Category.COMBAT) {
                 },
                 cps
             )
-
-            if (blocking) {
-                network.sendPacket(PlayerInteractItemC2SPacket(player.activeHand))
-            }
         }
     }
 
