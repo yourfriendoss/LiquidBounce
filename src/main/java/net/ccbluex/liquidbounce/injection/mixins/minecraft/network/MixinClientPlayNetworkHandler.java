@@ -22,8 +22,10 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.network;
 import net.ccbluex.liquidbounce.event.ChunkLoadEvent;
 import net.ccbluex.liquidbounce.event.ChunkUnloadEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.event.HealthUpdateEvent;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
+import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,6 +43,11 @@ public class MixinClientPlayNetworkHandler {
     @Inject(method = "onUnloadChunk", at = @At("RETURN"))
     private void injectUnloadEvent(UnloadChunkS2CPacket packet, CallbackInfo ci) {
         EventManager.INSTANCE.callEvent(new ChunkUnloadEvent(packet.getX(), packet.getZ()));
+    }
+
+    @Inject(method = "onHealthUpdate", at = @At("RETURN"))
+    private void injectHealthUpdate(HealthUpdateS2CPacket packet, CallbackInfo ci) {
+        EventManager.INSTANCE.callEvent(new HealthUpdateEvent(packet.getHealth(), packet.getFood(), packet.getSaturation()));
     }
 
 }
