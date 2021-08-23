@@ -28,10 +28,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed.IceSpeed.Motion.motion
 import net.ccbluex.liquidbounce.utils.block.getBlock
-import net.minecraft.block.FrostedIceBlock
-import net.minecraft.block.IceBlock
-import net.minecraft.block.LadderBlock
-import net.minecraft.block.VineBlock
+import net.minecraft.block.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -120,8 +117,10 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
             val motion by float("Motion", 0.5f, 0.2f..1f)
         }
 
+        val iceBlocks = hashSetOf<Block>(Blocks.ICE, Blocks.BLUE_ICE, Blocks.FROSTED_ICE, Blocks.PACKED_ICE)
+
         val blockSlipperinessMultiplierHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
-            if (event.block is IceBlock || event.block is FrostedIceBlock) {
+            if (event.block in iceBlocks) {
                 if (Motion.enabled) {
                     player.velocity.x *= motion
                     player.velocity.z *= motion
