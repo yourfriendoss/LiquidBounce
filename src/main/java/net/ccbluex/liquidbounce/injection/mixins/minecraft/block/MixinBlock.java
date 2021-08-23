@@ -20,7 +20,6 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.block;
 
 import net.ccbluex.liquidbounce.event.BlockVelocityMultiplierEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
-import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed;
 import net.minecraft.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
