@@ -28,9 +28,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed.IceSpeed.Motion.motion
 import net.ccbluex.liquidbounce.utils.block.getBlock
-import net.minecraft.block.Blocks
-import net.minecraft.block.LadderBlock
-import net.minecraft.block.VineBlock
+import net.minecraft.block.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -115,19 +113,31 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
 
         val slipperiness by float("Slipperiness", 0.6f, 0.3f..1f)
 
-        private object Motion : ToggleableConfigurable(ModuleTerrainSpeed, "Motion", false) {
+        object Motion : ToggleableConfigurable(ModuleTerrainSpeed, "Motion", false) {
             val motion by float("Motion", 0.5f, 0.2f..1f)
         }
 
-        val iceBlocks = arrayOf(Blocks.ICE, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.PACKED_ICE)
+        val a by boolean("a", false)
+
+        var iceBlocks = arrayListOf<Block>(Blocks.ICE, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.FROSTED_ICE)
 
         val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
-            if (event.block == iceBlocks) {
-                if (Motion.enabled) {
-                    player.velocity.x *= motion
-                    player.velocity.z *= motion
+            if (a) {
+                if (event.block is IceBlock) {
+                    if (Motion.enabled) {
+                        player.velocity.x *= motion
+                        player.velocity.z *= motion
+                    }
+                    event.slipperiness = slipperiness
                 }
-                event.slipperiness = slipperiness
+            } else {
+                if (event.block == iceBlocks) {
+                    if (Motion.enabled) {
+                        player.velocity.x *= motion
+                        player.velocity.z *= motion
+                    }
+                    event.slipperiness = slipperiness
+                }
             }
         }
     }
@@ -135,6 +145,7 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
     init {
         tree(FastClimb)
         tree(IceSpeed)
+        tree(IceSpeed.Motion)
     }
 
 }
