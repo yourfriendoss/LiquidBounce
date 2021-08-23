@@ -40,11 +40,4 @@ public class MixinBlock {
         callback.setReturnValue(multiplierEvent.getMultiplier());
     }
 
-    @Inject(method = "getSlipperiness", at = @At("RETURN"), cancellable = true)
-    private void hookSlipperiness(CallbackInfoReturnable<Float> cir) {
-        if (ModuleTerrainSpeed.INSTANCE.getEnabled() && ModuleTerrainSpeed.IceSpeed.INSTANCE.getEnabled()) {
-            cir.setReturnValue(ModuleTerrainSpeed.IceSpeed.INSTANCE.getMotion());
-        }
-    }
-
 }
