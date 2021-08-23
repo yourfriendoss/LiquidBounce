@@ -44,8 +44,7 @@
     "minecraft.render.MixinRenderTickCounter",
     "minecraft.render.MixinSignBlockEntityRenderer",
     "minecraft.render.MixinTextRenderer",
-    "minecraft.render.MixinWorldRenderer",
-    "minecraft.render.MixinShieldRenderer"
+    "minecraft.render.MixinWorldRenderer"
   ],
   "server": [],
   "injectors": {
