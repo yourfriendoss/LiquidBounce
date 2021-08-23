@@ -20,10 +20,12 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.block;
 
 import net.ccbluex.liquidbounce.event.BlockShapeEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.features.module.modules.world.ModuleLiquidInteract;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,6 +44,13 @@ public class MixinFluidBlock {
         final BlockShapeEvent shapeEvent = new BlockShapeEvent(state, pos, callback.getReturnValue());
         EventManager.INSTANCE.callEvent(shapeEvent);
         callback.setReturnValue(shapeEvent.getShape());
+    }
+
+    @Inject(method = "isSideInvisible", at = @At("RETURN"), cancellable = true)
+    private void hookInvisibleSide(BlockState state, BlockState stateFrom, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (ModuleLiquidInteract.INSTANCE.getEnabled()) {
+            cir.setReturnValue(ModuleLiquidInteract.INSTANCE.getA());
+        }
     }
 
 }
