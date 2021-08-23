@@ -99,9 +99,9 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
 
-        val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
+        val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
             if (event.block is SlimeBlock) {
-                event.multiplier = multiplier
+                event.multiplier *= multiplier
             }
         }
 
