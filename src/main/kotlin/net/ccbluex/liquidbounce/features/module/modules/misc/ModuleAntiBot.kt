@@ -60,7 +60,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     val repeatable = handler<StateUpdateEvent> {
-        if (mc.world == null || pName == null) {
+        if (mc.world == null || mc.player == null || pName == null) {
             return@handler
         }
 
