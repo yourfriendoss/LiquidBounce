@@ -24,36 +24,36 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             return@handler
         }
 
-        when (val packet = event.packet) {
-            is PlayerListS2CPacket -> {
-                when (packet.action) {
-                    PlayerListS2CPacket.Action.ADD_PLAYER -> {
-                        for (entry in packet.entries) {
-                            if (entry.profile.name.length < 3) {
-                                continue
-                            }
+        val packet = event.packet
 
-                            if (isADuplicate(entry.profile)) {
-                                event.cancelEvent()
-                                notification(
-                                    "AntiBot",
-                                    "Removed ${entry.profile.name}",
-                                    NotificationEvent.Severity.INFO
-                                )
-                            } else {
-                                pName = entry.profile.name
-                            }
+        if (packet is PlayerListS2CPacket) {
+            when (packet.action) {
+                PlayerListS2CPacket.Action.ADD_PLAYER -> {
+                    for (entry in packet.entries) {
+                        if (entry.profile.name.length < 3) {
+                            continue
+                        }
+
+                        if (isADuplicate(entry.profile)) {
+                            event.cancelEvent()
+                            notification(
+                                "AntiBot",
+                                "Removed ${entry.profile.name}",
+                                NotificationEvent.Severity.INFO
+                            )
+                        } else {
+                            pName = entry.profile.name
                         }
                     }
-                    PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
-                        for (entry in packet.entries) {
-                            if (entry.profile.name == pName) {
-                                pName = null
-                            }
+                }
+                PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
+                    for (entry in packet.entries) {
+                        if (entry.profile.name == pName) {
+                            pName = null
                         }
                     }
-                    else -> {
-                    }
+                }
+                else -> {
                 }
             }
         }
