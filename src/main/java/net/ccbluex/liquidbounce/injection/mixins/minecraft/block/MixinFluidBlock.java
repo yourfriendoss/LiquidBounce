@@ -47,11 +47,4 @@ public class MixinFluidBlock {
         callback.setReturnValue(shapeEvent.getShape());
     }
 
-    @Inject(method = "isTranslucent", at = @At("RETURN"), cancellable = true)
-    private void hookRenderType(BlockState state, BlockView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleLiquidInteract.INSTANCE.getEnabled()) {
-            cir.setReturnValue(ModuleLiquidInteract.INSTANCE.getA());
-        }
-    }
-
 }
