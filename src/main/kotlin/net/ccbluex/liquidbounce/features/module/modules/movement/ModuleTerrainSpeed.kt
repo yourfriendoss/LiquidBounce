@@ -21,11 +21,13 @@ package net.ccbluex.liquidbounce.features.module.modules.movement
 import net.ccbluex.liquidbounce.config.Choice
 import net.ccbluex.liquidbounce.config.ChoiceConfigurable
 import net.ccbluex.liquidbounce.config.ToggleableConfigurable
+import net.ccbluex.liquidbounce.event.BlockVelocityMultiplierEvent
 import net.ccbluex.liquidbounce.event.PlayerMoveEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.block.getBlock
+import net.minecraft.block.IceBlock
 import net.minecraft.block.LadderBlock
 import net.minecraft.block.VineBlock
 import net.minecraft.util.math.BlockPos
@@ -104,10 +106,24 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
 
     }
 
-    // todo: add other terrain speed options
+    /**
+     * Ice Speed allows you to manipulate slide speed.
+     */
+    private object IceSpeed : ToggleableConfigurable(this, "IceSpeed", true) {
+
+        private val motion by float("Motion", 1f, 0.2f..3f)
+
+        val blockVelocityMultiplierHandler = handler<BlockVelocityMultiplierEvent> { event ->
+
+            if (event.block is IceBlock) {
+                event.multiplier = motion
+            }
+        }
+    }
 
     init {
         tree(FastClimb)
+        tree(IceSpeed)
     }
 
 }
