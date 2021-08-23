@@ -83,50 +83,11 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
     }
 
-    private object Honeyblock : ToggleableConfigurable(this, "HoneyBlock", true) {
-
-        val multiplier by float("Multiplier", 1f, 0.4f..2f)
-
-        val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
-            if (event.block is HoneyBlock) {
-                event.multiplier = multiplier
-            }
-        }
-
-    }
-
-    private object Slimeblock : ToggleableConfigurable(this, "SlimeBlock", true) {
-
-        val multiplier by float("Multiplier", 1f, 0f..1f)
-
-        val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
-            if (event.block is SlimeBlock) {
-                event.multiplier = multiplier
-            }
-        }
-
-    }
-
-    private object PowderSnow : ToggleableConfigurable(this, "PowderSnow", true) {
-
-        val multiplier by float("Multiplier", 1f, 0.4f..2f)
-
-        val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
-            if (event.block is PowderSnowBlock) {
-                event.multiplier = multiplier
-            }
-        }
-
-    }
-
     init {
         tree(Block)
         tree(Consume)
         tree(Bow)
         tree(Soulsand)
-        tree(Honeyblock)
-        tree(Slimeblock)
-        tree(PowderSnow)
     }
 
     val multiplierHandler = handler<PlayerUseMultiplier> { event ->

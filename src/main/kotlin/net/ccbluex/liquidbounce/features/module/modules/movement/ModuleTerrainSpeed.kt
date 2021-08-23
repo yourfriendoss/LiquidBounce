@@ -21,17 +21,11 @@ package net.ccbluex.liquidbounce.features.module.modules.movement
 import net.ccbluex.liquidbounce.config.Choice
 import net.ccbluex.liquidbounce.config.ChoiceConfigurable
 import net.ccbluex.liquidbounce.config.ToggleableConfigurable
-import net.ccbluex.liquidbounce.event.BlockVelocityMultiplierEvent
-import net.ccbluex.liquidbounce.event.PlayerMoveEvent
-import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.event.repeatable
+import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.block.getBlock
-import net.minecraft.block.Blocks
-import net.minecraft.block.IceBlock
-import net.minecraft.block.LadderBlock
-import net.minecraft.block.VineBlock
+import net.minecraft.block.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -108,8 +102,25 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
 
     }
 
+    /**
+     * Ice Speed allows you to manipulate slipperiness speed
+     */
+
+    private object IceSpeed : ToggleableConfigurable(this, "IceSpeed", true) {
+
+        val slipperiness by float("Slipperiness", 0.6f, 0.2f..1f)
+
+        val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
+
+            if (event.block is IceBlock || event.block is FrostedIceBlock) {
+                event.slipperiness = slipperiness
+            }
+        }
+    }
+
     init {
         tree(FastClimb)
+        tree(IceSpeed)
     }
 
 }

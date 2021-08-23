@@ -129,7 +129,7 @@ class BlockAttackEvent(val pos: BlockPos) : Event()
 class BlockVelocityMultiplierEvent(val block: Block, var multiplier: Float) : Event()
 
 @Nameable("blockSlipperiness")
-class BlockSlipperinessMultiplierEvent(val block: Block, var multiplier: Float) : Event()
+class BlockSlipperinessMultiplierEvent(val block: Block, var slipperiness: Float) : Event()
 
 // Entity events
 
