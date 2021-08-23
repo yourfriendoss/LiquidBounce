@@ -21,11 +21,16 @@ package net.ccbluex.liquidbounce.features.module.modules.movement
 import net.ccbluex.liquidbounce.config.Choice
 import net.ccbluex.liquidbounce.config.ChoiceConfigurable
 import net.ccbluex.liquidbounce.config.ToggleableConfigurable
-import net.ccbluex.liquidbounce.event.*
+import net.ccbluex.liquidbounce.event.BlockSlipperinessMultiplierEvent
+import net.ccbluex.liquidbounce.event.PlayerMoveEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed.IceSpeed.Motion.motion
 import net.ccbluex.liquidbounce.utils.block.getBlock
-import net.minecraft.block.*
+import net.minecraft.block.Blocks
+import net.minecraft.block.LadderBlock
+import net.minecraft.block.VineBlock
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -108,11 +113,20 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
 
     private object IceSpeed : ToggleableConfigurable(this, "IceSpeed", true) {
 
-        val slipperiness by float("Slipperiness", 0.6f, 0.2f..1f)
+        val slipperiness by float("Slipperiness", 0.6f, 0.3f..1f)
+
+        private object Motion : ToggleableConfigurable(ModuleTerrainSpeed, "Motion", false) {
+            val motion by float("Motion", 0.5f, 0.2f..1f)
+        }
+
+        val iceBlocks = arrayOf(Blocks.ICE, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.PACKED_ICE)
 
         val blockVelocityHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
-
-            if (event.block is IceBlock || event.block is FrostedIceBlock) {
+            if (event.block == iceBlocks) {
+                if (Motion.enabled) {
+                    player.velocity.x *= motion
+                    player.velocity.z *= motion
+                }
                 event.slipperiness = slipperiness
             }
         }
