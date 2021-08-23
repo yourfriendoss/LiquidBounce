@@ -20,6 +20,7 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.block;
 
 import net.ccbluex.liquidbounce.event.BlockVelocityMultiplierEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
+import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed;
 import net.minecraft.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,6 +38,13 @@ public class MixinBlock {
         final BlockVelocityMultiplierEvent multiplierEvent = new BlockVelocityMultiplierEvent((Block) (Object) this, callback.getReturnValue());
         EventManager.INSTANCE.callEvent(multiplierEvent);
         callback.setReturnValue(multiplierEvent.getMultiplier());
+    }
+
+    @Inject(method = "getSlipperiness", at = @At("RETURN"), cancellable = true)
+    private void hookSlipperiness(CallbackInfoReturnable<Float> cir) {
+        if (ModuleTerrainSpeed.INSTANCE.getEnabled() && ModuleTerrainSpeed.IceSpeed.INSTANCE.getEnabled()) {
+            cir.setReturnValue(ModuleTerrainSpeed.IceSpeed.INSTANCE.getMotion());
+        }
     }
 
 }

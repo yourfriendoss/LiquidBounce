@@ -109,9 +109,9 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
     /**
      * Ice Speed allows you to manipulate slide speed.
      */
-    private object IceSpeed : ToggleableConfigurable(this, "IceSpeed", true) {
+    object IceSpeed : ToggleableConfigurable(this, "IceSpeed", true) {
 
-        private val motion by float("Motion", 1f, 0.2f..3f)
+       val motion by float("Motion", 1f, 0.2f..3f)
 
         val blockVelocityMultiplierHandler = handler<BlockVelocityMultiplierEvent> { event ->
 
