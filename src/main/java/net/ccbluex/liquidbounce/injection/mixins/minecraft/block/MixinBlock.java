@@ -47,7 +47,7 @@ public class MixinBlock {
     private void hookSlipperiness(CallbackInfoReturnable<Float> cir) {
         final BlockSlipperinessMultiplierEvent multiplierEvent = new BlockSlipperinessMultiplierEvent((Block) (Object) this, cir.getReturnValue());
         EventManager.INSTANCE.callEvent(multiplierEvent);
-        cir.setReturnValue(multiplierEvent.getMultiplier());
+        cir.setReturnValue(multiplierEvent.getSlipperiness());
     }
 
 }
