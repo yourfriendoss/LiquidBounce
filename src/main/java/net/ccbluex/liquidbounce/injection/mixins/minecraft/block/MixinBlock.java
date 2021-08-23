@@ -20,12 +20,7 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.block;
 
 import net.ccbluex.liquidbounce.event.BlockVelocityMultiplierEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
-import net.ccbluex.liquidbounce.features.module.modules.world.ModuleLiquidInteract;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,10 +39,4 @@ public class MixinBlock {
         callback.setReturnValue(multiplierEvent.getMultiplier());
     }
 
-    @Inject(method = "shouldDrawSide", at = @At("RETURN"), cancellable = true)
-    private static void hookSideDraw(BlockState state, BlockView world, BlockPos pos, Direction side, BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleLiquidInteract.INSTANCE.getEnabled()) {
-            cir.setReturnValue(ModuleLiquidInteract.INSTANCE.getA());
-        }
-    }
 }
