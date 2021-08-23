@@ -113,7 +113,7 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
         val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
             if (event.block is PowderSnowBlock) {
-                event.block.slipperiness
+                event.multiplier = multiplier
             }
         }
 
