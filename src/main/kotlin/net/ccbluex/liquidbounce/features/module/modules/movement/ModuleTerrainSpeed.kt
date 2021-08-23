@@ -113,12 +113,6 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
 
        val motion by float("Motion", 1f, 0.2f..3f)
 
-        val blockVelocityMultiplierHandler = handler<BlockVelocityMultiplierEvent> { event ->
-
-            if (event.block is IceBlock) {
-                event.multiplier = motion
-            }
-        }
     }
 
     init {
