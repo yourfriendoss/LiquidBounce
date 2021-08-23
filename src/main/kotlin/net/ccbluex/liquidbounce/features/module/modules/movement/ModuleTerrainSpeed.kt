@@ -114,7 +114,7 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
         val slipperiness by float("Slipperiness", 0.6f, 0.3f..1f)
 
         object Motion : ToggleableConfigurable(ModuleTerrainSpeed, "Motion", false) {
-            val motion by float("Motion", 0.5f, 0.2f..1f)
+            val motion by float("Motion", 0.5f, 0.2f..2f)
         }
 
         val iceBlocks = hashSetOf<Block>(Blocks.ICE, Blocks.BLUE_ICE, Blocks.FROSTED_ICE, Blocks.PACKED_ICE)
