@@ -24,11 +24,16 @@ import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.BlockSlipperinessMultiplierEvent
 import net.ccbluex.liquidbounce.event.PlayerMoveEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleTerrainSpeed.IceSpeed.Motion.motion
 import net.ccbluex.liquidbounce.utils.block.getBlock
-import net.minecraft.block.*
+import net.ccbluex.liquidbounce.utils.entity.strafe
+import net.minecraft.block.Block
+import net.minecraft.block.Blocks
+import net.minecraft.block.LadderBlock
+import net.minecraft.block.VineBlock
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -130,10 +135,36 @@ object ModuleTerrainSpeed : Module("TerrainSpeed", Category.MOVEMENT) {
         }
     }
 
+    private object WaterSpeed : ToggleableConfigurable(this, "WaterSpeed", true) {
+
+        val speed by float("Speed", 1.3f, 1.1f..1.5f)
+        val strafe by boolean("Strafe", false)
+
+        val repeatable = repeatable {
+            if (player.isSubmergedInWater) {
+                if (strafe) {
+                    player.strafe(speed = speed.toDouble())
+                } else {
+                    player.velocity.x = when {
+                        player.isSprinting -> speed.toDouble()
+                        !player.isSprinting -> player.velocity.x * speed.toDouble()
+                        else -> return@repeatable
+                    }
+                    player.velocity.z = when {
+                        player.isSprinting -> speed.toDouble()
+                        !player.isSprinting -> player.velocity.z * speed.toDouble()
+                        else -> return@repeatable
+                    }
+                }
+            }
+        }
+    }
+
     init {
         tree(FastClimb)
         tree(IceSpeed)
         tree(IceSpeed.Motion)
+        tree(WaterSpeed)
     }
 
 }
