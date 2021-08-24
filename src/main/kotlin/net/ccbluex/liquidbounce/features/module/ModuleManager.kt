@@ -160,6 +160,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleNoBob,
             ModuleDankBobbing,
             ModuleAutoSoup,
+            ModuleAutoPot,
             ModuleNotifier,
             ModuleHoleESP,
             ModuleNoSignRender,
