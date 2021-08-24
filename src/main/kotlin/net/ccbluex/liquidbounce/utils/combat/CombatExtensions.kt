@@ -21,6 +21,7 @@ package net.ccbluex.liquidbounce.utils.combat
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.Configurable
 import net.ccbluex.liquidbounce.features.misc.FriendManager
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleNoFriends
 import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleTeams
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.entity.boxedDistanceTo
@@ -115,6 +116,8 @@ class EnemyConfigurable : Configurable("enemies") {
                     return animals
                 } else if (suspect is MobEntity) {
                     return mobs
+                } else if (attackable && FriendManager.isFriend(suspect.toString()) && ModuleNoFriends.enabled) {
+                    return true
                 }
             }
         }
