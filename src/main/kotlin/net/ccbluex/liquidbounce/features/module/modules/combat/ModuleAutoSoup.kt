@@ -91,9 +91,7 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
 
                     // If there is neither an empty slot nor an empty bowl, then replace whatever there is on slot 9
                     if (!player.inventory.getStack(9).isEmpty || player.inventory.getStack(9).item != Items.BOWL) {
-                        utilizeInventory(bowlHotbarSlot, 0, SlotActionType.PICKUP, true)
-                        utilizeInventory(9, 0, SlotActionType.PICKUP, true)
-                        utilizeInventory(bowlHotbarSlot, 0, SlotActionType.PICKUP, true)
+                        utilizeInventory(bowlHotbarSlot, 9, SlotActionType.SWAP, true)
                     } else {
                         // If there is, simply shift + click the empty bowl from hotbar
                         utilizeInventory(bowlHotbarSlot, 0, SlotActionType.QUICK_MOVE, true)
