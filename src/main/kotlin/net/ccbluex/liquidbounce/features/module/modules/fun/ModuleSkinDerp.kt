@@ -41,7 +41,7 @@ object ModuleSkinDerp : Module("SkinDerp", Category.FUN) {
     private val rightSleeve by boolean("RightSleeve", true)
     private val cape by boolean("Cape", true)
 
-    private var prevModelParts = emptySet<PlayerModelPart>()
+    private var prevModelParts = setOf<PlayerModelPart>()
 
     override fun enable() {
         prevModelParts = mc.options.enabledPlayerModelParts
