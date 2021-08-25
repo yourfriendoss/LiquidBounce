@@ -49,6 +49,7 @@ object ModuleSuperKnockback : Module("SuperKnockback", Category.COMBAT) {
             if (enemy is LivingEntity && enemy.hurtTime <= hurtTime && !ModuleCriticals.wouldCrit()) {
                 if (player.isSprinting) {
                     network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
+                    player.isSprinting = false
                 }
 
                 network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
@@ -71,6 +72,7 @@ object ModuleSuperKnockback : Module("SuperKnockback", Category.COMBAT) {
             if (enemy is LivingEntity && enemy.hurtTime <= hurtTime && !ModuleCriticals.wouldCrit()) {
                 if (player.isSprinting) {
                     network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
+                    player.isSprinting = false
                 }
 
                 network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
