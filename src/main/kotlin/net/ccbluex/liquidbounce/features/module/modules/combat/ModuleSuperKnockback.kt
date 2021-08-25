@@ -19,6 +19,8 @@
 
 package net.ccbluex.liquidbounce.features.module.modules.combat
 
+import net.ccbluex.liquidbounce.config.Choice
+import net.ccbluex.liquidbounce.config.ChoiceConfigurable
 import net.ccbluex.liquidbounce.event.AttackEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -33,23 +35,47 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
  */
 object ModuleSuperKnockback : Module("SuperKnockback", Category.COMBAT) {
 
+    val modes = choices("Mode", Packet, arrayOf(Packet, WTap))
     val hurtTime by int("HurtTime", 10, 0..10)
 
-    val attackHandler = handler<AttackEvent> { event ->
-        val enemy = event.enemy
+    private object Packet : Choice("Packet") {
 
-        if (enemy is LivingEntity && enemy.hurtTime <= hurtTime && !ModuleCriticals.wouldCrit()) {
-            if (player.isSprinting) {
+        override val parent: ChoiceConfigurable
+            get() = modes
+
+        val attackHandler = handler<AttackEvent> { event ->
+            val enemy = event.enemy
+
+            if (enemy is LivingEntity && enemy.hurtTime <= hurtTime && !ModuleCriticals.wouldCrit()) {
+                if (player.isSprinting) {
+                    network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
+                }
+
+                network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
                 network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
+                network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
+
+                player.lastSprinting = true
             }
-
-            network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
-            network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
-            network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
-
-            player.isSprinting = true
-            player.lastSprinting = true
         }
     }
 
+    private object WTap : Choice("WTap") {
+
+        override val parent: ChoiceConfigurable
+            get() = modes
+
+        val attackHandler = handler<AttackEvent> { event ->
+            val enemy = event.enemy
+
+            if (enemy is LivingEntity && enemy.hurtTime <= hurtTime && !ModuleCriticals.wouldCrit()) {
+                if (player.isSprinting) {
+                    network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.STOP_SPRINTING))
+                }
+
+                network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.START_SPRINTING))
+                player.lastSprinting = true
+            }
+        }
+    }
 }
