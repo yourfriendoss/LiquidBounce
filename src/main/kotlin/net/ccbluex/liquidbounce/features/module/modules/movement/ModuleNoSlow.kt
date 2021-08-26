@@ -89,7 +89,7 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
 
         val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
-            if (event.block is WaterFluid) {
+            if (event.block is FluidBlock) {
                 event.multiplier = multiplier
             }
         }
