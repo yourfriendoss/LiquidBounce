@@ -17,7 +17,7 @@ public class MixinSlimeBlock {
     @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
     private void hookStep(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled()) {
-            entity.setVelocity(ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), entity.getVelocity().y, ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier());
+            entity.setVelocity(entity.getVelocity().x * ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), entity.getVelocity().y, entity.getVelocity().z * ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier());
         }
     }
 }
