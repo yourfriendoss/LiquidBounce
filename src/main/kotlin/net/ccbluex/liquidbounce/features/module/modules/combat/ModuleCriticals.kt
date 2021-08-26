@@ -78,8 +78,9 @@ object ModuleCriticals : Module("Criticals", Category.COMBAT) {
             val (x, y, z) = player.exactPosition
 
             network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(x, y + 0.11, z, false))
-            network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(x, y + 0.1100013579, z, false))
-            network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(x, y + 0.0000013579, z, false))
+            repeat(2) {
+                network.sendPacket(PlayerMoveC2SPacket.PositionAndOnGround(x, y + 0.1100013579, z, false))
+            }
         }
     }
 
