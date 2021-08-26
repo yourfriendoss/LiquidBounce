@@ -18,8 +18,7 @@ public class MixinPowderSnowBlock {
     @Inject(method = "onEntityCollision", at = @At("RETURN"), cancellable = true)
     private void hookEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.PowderSnow.INSTANCE.getEnabled()) {
-            ci.cancel();
-            entity.setVelocity(new Vec3d(ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), 1.5D, ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier()));
+            entity.setVelocity(new Vec3d(-ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), 0.0D, -ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier()));
         }
     }
 }
