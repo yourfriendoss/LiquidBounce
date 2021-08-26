@@ -1,4 +1,3 @@
-
 /*
  * This file is part of LiquidBounce (https://github.com/CCBlueX/LiquidBounce)
  *
@@ -23,37 +22,40 @@ import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
+import net.ccbluex.liquidbounce.utils.aiming.RotationManager
+import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.raycast
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.Blocks
-import net.minecraft.item.ItemUsageContext
+import net.minecraft.block.CobwebBlock
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
 
 /**
- * Ignite module
+ * BlockTrap module
  *
- * Automatically sets targets around you on fire.
+ * Automatically traps players around you.
  */
-object ModuleIgnite : Module("Ignite", Category.WORLD) {
+object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
 
-    var delay by int("Delay", 20, 0..400)
+    var delay by int("Delay", 20, 0..40)
 
     // Target
     private val targetTracker = tree(TargetTracker())
 
+    // Rotations
+    private val rotations = tree(RotationsConfigurable())
+
     val networkTickHandler = repeatable {
         val player = mc.player ?: return@repeatable
 
-        val slot = findHotbarSlot(Items.LAVA_BUCKET) ?: return@repeatable
+        val slot = findHotbarSlot(arrayListOf(Items.LAVA_BUCKET, Items.FLINT_AND_STEEL, Items.COBWEB)) ?: return@repeatable
 
         for (enemy in targetTracker.enemies()) {
             if (enemy.squaredBoxedDistanceTo(player) > 6.0 * 6.0) {
@@ -64,7 +66,7 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
 
             val state = pos.getState()
 
-            if (state?.block == Blocks.LAVA) {
+            if (enemy.isOnFire || state?.block is CobwebBlock) {
                 continue
             }
 
@@ -77,33 +79,22 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                 continue
             }
 
-            player.networkHandler.sendPacket(PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, player.isOnGround))
+            RotationManager.aimAt(rotation, configurable = rotations)
 
             if (slot != player.inventory.selectedSlot) {
-                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(slot))
+                network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
             }
 
-            player.networkHandler.sendPacket(PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, rayTraceResult))
-            val itemUsageContext = ItemUsageContext(player, Hand.MAIN_HAND, rayTraceResult)
-
-            val itemStack = player.inventory.getStack(slot)
-
-            val actionResult: ActionResult
-
-            if (player.isCreative) {
-                val i = itemStack.count
-                actionResult = itemStack.useOnBlock(itemUsageContext)
-                itemStack.count = i
-            } else {
-                actionResult = itemStack.useOnBlock(itemUsageContext)
-            }
-
-            if (actionResult.shouldSwingHand()) {
+            if (interaction.interactBlock(player, world, Hand.MAIN_HAND, rayTraceResult) == ActionResult.SUCCESS) {
+                if (player.inventory.getStack(slot).item == Items.LAVA_BUCKET) {
+                    network.sendPacket(PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, rayTraceResult))
+                    player.swingHand(Hand.MAIN_HAND)
+                }
                 player.swingHand(Hand.MAIN_HAND)
             }
 
             if (slot != player.inventory.selectedSlot) {
-                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
+                network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
             }
 
             break

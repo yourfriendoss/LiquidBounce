@@ -38,6 +38,8 @@ fun createItem(stack: String, amount: Int = 1): ItemStack = ItemStringReader(Str
     ItemStackArgument(it.item, it.nbt).createStack(amount, false)
 }
 
+fun findHotbarSlot(item: ArrayList<Item>): Int? = findHotbarSlot { it.item == item }
+
 fun findHotbarSlot(item: Item): Int? = findHotbarSlot { it.item == item }
 
 fun findHotbarSlot(predicate: (ItemStack) -> Boolean): Int? {
