@@ -23,10 +23,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.rotationsConfigurable
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager
-import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
-import net.ccbluex.liquidbounce.utils.aiming.raycast
-import net.ccbluex.liquidbounce.utils.aiming.raytraceBlock
+import net.ccbluex.liquidbounce.utils.aiming.*
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.block.searchBlocksInRadius
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
@@ -83,7 +80,8 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                 return@repeatable
             }
 
-            RotationManager.aimAt(serverRotation, configurable = rotations)
+            RotationManager.aimAt(
+                Rotation(serverRotation.yaw, serverRotation.pitch), configurable = rotations)
 
             if (slot != player.inventory.selectedSlot) {
                 player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(slot))
