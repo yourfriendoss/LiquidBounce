@@ -17,7 +17,7 @@ public class MixinPowderSnowBlock {
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     private void hookEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.PowderSnow.INSTANCE.getEnabled()) {
-            entity.setVelocity(ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), entity.getVelocity().getY(), ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier());
+            ci.cancel();
         }
     }
 }
