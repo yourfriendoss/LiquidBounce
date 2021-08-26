@@ -24,6 +24,7 @@ import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.minecraft.block.*
+import net.minecraft.fluid.WaterFluid
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.util.UseAction
@@ -83,11 +84,25 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
     }
 
+    private object Liquid : ToggleableConfigurable(this, "Liquid", true) {
+
+        val multiplier by float("Multiplier", 1f, 0.4f..2f)
+
+        val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
+            if (event.block is WaterFluid) {
+                event.multiplier = multiplier
+            }
+        }
+
+    }
+
+
     init {
         tree(Block)
         tree(Consume)
         tree(Bow)
         tree(Soulsand)
+        tree(Liquid)
     }
 
     val multiplierHandler = handler<PlayerUseMultiplier> { event ->
