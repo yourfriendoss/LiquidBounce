@@ -21,15 +21,15 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.rotationsConfigurable
+import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
+import net.ccbluex.liquidbounce.utils.aiming.raycast
 import net.ccbluex.liquidbounce.utils.aiming.raytraceBlock
-import net.ccbluex.liquidbounce.utils.block.getCenterDistanceSquared
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.block.searchBlocksInRadius
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
-import net.ccbluex.liquidbounce.utils.entity.eyesPos
-import net.ccbluex.liquidbounce.utils.entity.getNearestPoint
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.minecraft.item.Items
@@ -38,9 +38,6 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.RaycastContext
 
 /**
  * Ignite module
@@ -56,8 +53,6 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
 
     val rotations = tree(RotationsConfigurable())
 
-    private var currentBlock: BlockPos? = null
-
     val networkTickHandler = repeatable {
         val player = mc.player ?: return@repeatable
 
@@ -68,13 +63,13 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                 continue
             }
 
+            val pos = enemy.blockPos
+
             if (enemy.isOnFire) {
                 continue
             }
 
-            updateTarget(enemy)
-
-            val curr = currentBlock ?: return@repeatable
+            val curr = pos ?: return@repeatable
             val serverRotation = RotationManager.serverRotation ?: return@repeatable
 
             val rayTraceResult = raytraceBlock(
@@ -88,8 +83,10 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                 return@repeatable
             }
 
+            RotationManager.aimAt(serverRotation, configurable = rotations)
+
             if (slot != player.inventory.selectedSlot) {
-                network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
+                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(slot))
             }
 
             if (interaction.interactBlock(
@@ -99,64 +96,19 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                     rayTraceResult
                 ) == ActionResult.SUCCESS
             ) {
-                    player.swingHand(Hand.MAIN_HAND)
+                player.swingHand(Hand.MAIN_HAND)
             }
 
+
             if (slot != player.inventory.selectedSlot) {
-                network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
+                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
             }
 
             wait(delay)
+
             return@repeatable
         }
 
     }
 
-    private fun updateTarget(entity: net.minecraft.entity.Entity) {
-        currentBlock = null
-
-        val radius = 6.0f + 1
-        val radiusSquared = radius * radius
-        val eyesPos = player.eyesPos
-
-        val blockToProcess = searchBlocksInRadius(radius) { _, state ->
-            !state.isAir && getNearestPoint(
-                eyesPos,
-                Box(entity.blockPos, entity.blockPos.add(1, 1, 1))
-            ).squaredDistanceTo(eyesPos) <= radiusSquared
-        }.minByOrNull { it.first.getCenterDistanceSquared() } ?: return
-
-        val (pos, state) = blockToProcess
-
-        val rt = RotationManager.raytraceBlock(
-            player.eyesPos,
-            pos,
-            state,
-            range = 6.0,
-            wallsRange = 0.0
-        )
-
-        // We got a free angle at the block? Cool.
-        if (rt != null) {
-            val (rotation, _) = rt
-            RotationManager.aimAt(rotation, configurable = rotations)
-            currentBlock = pos
-            return
-        }
-
-        val raytraceResult = world.raycast(
-            RaycastContext(
-                player.eyesPos,
-                Vec3d.of(pos).add(0.5, 0.5, 0.5),
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE,
-                player
-            )
-        ) ?: return
-
-        // Failsafe. Should not trigger
-        if (raytraceResult.type != HitResult.Type.BLOCK) return
-
-        currentBlock = raytraceResult.blockPos
-    }
 }
