@@ -27,6 +27,7 @@ import net.ccbluex.liquidbounce.utils.aiming.*
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.block.searchBlocksInRadius
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
+import net.ccbluex.liquidbounce.utils.entity.eyesPos
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.minecraft.item.Items
@@ -66,22 +67,22 @@ object ModuleIgnite : Module("Ignite", Category.WORLD) {
                 continue
             }
 
-            val curr = pos ?: return@repeatable
+            val rotation = RotationManager.raytraceUpperBlockSide(player.eyesPos, 6.0, 0.0, pos) ?: return@repeatable
+
+            RotationManager.aimAt(rotation.rotation, configurable = rotations)
+
             val serverRotation = RotationManager.serverRotation ?: return@repeatable
 
             val rayTraceResult = raytraceBlock(
                 6.0,
                 serverRotation,
-                curr,
-                curr.getState() ?: return@repeatable
+                pos,
+                pos.getState() ?: return@repeatable
             )
 
-            if (rayTraceResult?.type != HitResult.Type.BLOCK || rayTraceResult.blockPos != curr) {
+            if (rayTraceResult?.type != HitResult.Type.BLOCK || rayTraceResult.blockPos != pos) {
                 return@repeatable
             }
-
-            RotationManager.aimAt(
-                Rotation(serverRotation.yaw, serverRotation.pitch), configurable = rotations)
 
             if (slot != player.inventory.selectedSlot) {
                 player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(slot))
