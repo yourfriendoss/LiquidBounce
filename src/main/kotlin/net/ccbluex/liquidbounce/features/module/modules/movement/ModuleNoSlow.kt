@@ -84,25 +84,12 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
     }
 
-    private object Liquid : ToggleableConfigurable(this, "Liquid", true) {
-
-        val multiplier by float("Multiplier", 1f, 0.4f..2f)
-
-        val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
-            if (event.block is FluidBlock) {
-                event.multiplier = multiplier
-            }
-        }
-
-    }
-
 
     init {
         tree(Block)
         tree(Consume)
         tree(Bow)
         tree(Soulsand)
-        tree(Liquid)
     }
 
     val multiplierHandler = handler<PlayerUseMultiplier> { event ->
