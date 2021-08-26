@@ -84,7 +84,7 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
     }
 
-    private object Slime : ToggleableConfigurable(this, "SlimeBlock", true) {
+    object Slime : ToggleableConfigurable(this, "SlimeBlock", true) {
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
 
         val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
@@ -104,7 +104,7 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
         }
     }
 
-    private object PowderSnow : ToggleableConfigurable(this, "PowderSnow", true) {
+    object PowderSnow : ToggleableConfigurable(this, "PowderSnow", true) {
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
 
         val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
