@@ -99,6 +99,7 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
     }
 
     object PowderSnow : ToggleableConfigurable(this, "PowderSnow", true) {
+        val a by boolean("a", false)
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
     }
 

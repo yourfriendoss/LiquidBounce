@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.PowderSnowBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +18,8 @@ public class MixinPowderSnowBlock {
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     private void hookEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.PowderSnow.INSTANCE.getEnabled()) {
-            ci.cancel();
+            entity.slowMovement(state, new Vec3d(0.0, 0.0, 0.0));
+            if (ModuleNoSlow.PowderSnow.INSTANCE.getA()) entity.setVelocity(ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier(), entity.getVelocity().y, ModuleNoSlow.PowderSnow.INSTANCE.getMultiplier());
         }
     }
 }
