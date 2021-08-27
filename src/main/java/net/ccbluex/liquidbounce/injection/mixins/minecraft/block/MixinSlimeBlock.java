@@ -20,7 +20,7 @@ public class MixinSlimeBlock {
     @Inject(method = "bounce", at = @At("HEAD"), cancellable = true)
     private void hookBounce(Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled()) {
-            if (entity.getVelocity().y == 0.0) {
+            if (entity.getVelocity().y >= -0.001567998535156222) {
                 ci.cancel();
             }
         }
