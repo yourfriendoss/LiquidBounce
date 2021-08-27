@@ -16,20 +16,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SlimeBlock.class)
 public class MixinSlimeBlock {
+
     /**
      * @author mems01
      */
     @Overwrite
     private void bounce(Entity entity) {
         Vec3d vec3d = entity.getVelocity();
-        if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled() ) {
-            entity.setVelocity(vec3d);
-            return;
-        }
         if (vec3d.y < 0.0D) {
             double d = entity instanceof LivingEntity ? 1.0D : 0.8D;
-            entity.setVelocity(vec3d.x, -vec3d.y * d, vec3d.z);
+            entity.setVelocity(vec3d.x, ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled() ? vec3d.y : -vec3d.y * d, vec3d.z);
         }
 
+    }
+
+    @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
+    private void hookStep(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
+        if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.PowderSnow.INSTANCE.getA()) {
+            ci.cancel();
+        }
     }
 }
