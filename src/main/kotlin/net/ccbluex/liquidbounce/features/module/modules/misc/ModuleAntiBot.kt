@@ -34,13 +34,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                             continue
                         }
 
-                        if (isADuplicate(entry)) {
+                        if (isADuplicate(entry.profile)) {
                             event.cancelEvent()
-                            notification(
-                                "AntiBot",
-                                "Removed ${entry.profile.name}",
-                                NotificationEvent.Severity.INFO
-                            )
+                            notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                         } else {
                             pName = entry.profile.name
                         }
@@ -80,8 +76,8 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    private fun isADuplicate(entry: PlayerListS2CPacket.Entry): Boolean {
-        return world.entities.count { it is PlayerEntity && it.displayName == entry.displayName || it.displayName.asString() == entry.displayName.toString() } > 0
+    private fun isADuplicate(profile: GameProfile): Boolean {
+        return network.playerList.count { it.profile.name == profile.name } > 0
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
