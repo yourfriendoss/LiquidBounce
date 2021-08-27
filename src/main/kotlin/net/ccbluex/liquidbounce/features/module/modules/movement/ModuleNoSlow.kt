@@ -23,6 +23,7 @@ import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.client.chat
 import net.minecraft.block.*
 import net.minecraft.fluid.WaterFluid
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
@@ -82,6 +83,10 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
             }
         }
 
+    }
+
+    val repeatable = repeatable {
+        chat("${player.velocity.y}")
     }
 
     object Slime : ToggleableConfigurable(this, "SlimeBlock", true) {
