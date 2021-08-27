@@ -66,9 +66,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if ((!isArmored(entity) || entity.ping < 2) || (isArmored(entity) && entity.ping < 2)) {
+                if (!isArmored(entity) || entity.ping < 2) {
                     pName = null
                 }
+
                 if (pName != null) {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
@@ -80,7 +81,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     private fun isADuplicate(profile: GameProfile): Boolean {
-        return network.playerList.count { it.profile.name == profile.name } > 0
+        return network.playerList.count { it.profile.name.equals(profile.name, true) } > 0
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
