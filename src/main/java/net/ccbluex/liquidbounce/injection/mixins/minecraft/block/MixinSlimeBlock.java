@@ -19,8 +19,9 @@ public class MixinSlimeBlock {
 
     @Inject(method = "bounce", at = @At("HEAD"), cancellable = true)
     private void hookBounce(Entity entity, CallbackInfo ci) {
+        double d = entity instanceof LivingEntity ? 1.0D : 0.8D;
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled()) {
-            if (entity.getVelocity().y >= -0.001567998535156222) {
+            if (entity.getVelocity().y == -entity.getVelocity().y * d) {
                 ci.cancel();
             }
         }
