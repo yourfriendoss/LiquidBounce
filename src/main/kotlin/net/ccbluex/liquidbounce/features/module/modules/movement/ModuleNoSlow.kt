@@ -86,6 +86,18 @@ object ModuleNoSlow : Module("NoSlow", Category.MOVEMENT) {
 
     object Slime : ToggleableConfigurable(this, "SlimeBlock", true) {
         val multiplier by float("Multiplier", 1f, 0.4f..2f)
+
+        val blockSlipperinessMultiplierHandler = handler<BlockSlipperinessMultiplierEvent> { event ->
+            if (event.block is SlimeBlock) {
+                event.slipperiness = 0.6f
+            }
+        }
+
+        val blockVelocityHandler = handler<BlockVelocityMultiplierEvent> { event ->
+            if (event.block is SlimeBlock) {
+                event.multiplier = multiplier
+            }
+        }
     }
 
     private object Honey : ToggleableConfigurable(this, "HoneyBlock", true) {
