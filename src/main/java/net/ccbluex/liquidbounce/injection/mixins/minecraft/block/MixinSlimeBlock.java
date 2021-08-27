@@ -25,6 +25,7 @@ public class MixinSlimeBlock {
     private void hookStep(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
         if (ModuleNoSlow.INSTANCE.getEnabled() && ModuleNoSlow.Slime.INSTANCE.getEnabled()) {
             ci.cancel();
+            entity.setVelocity(entity.getVelocity().x, entity.getVelocity().y, entity.getVelocity().z);
         }
     }
 }
