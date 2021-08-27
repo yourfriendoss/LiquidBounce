@@ -34,7 +34,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                             continue
                         }
 
-                        if (isADuplicate(entry.profile)) {
+                        if (isADuplicate(entry)) {
                             event.cancelEvent()
                             notification(
                                 "AntiBot",
@@ -80,8 +80,8 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    private fun isADuplicate(profile: GameProfile): Boolean {
-        return world.players.count { it.entityName.equals(profile.name, true) } > 0
+    private fun isADuplicate(entry: PlayerListS2CPacket.Entry): Boolean {
+        return world.players.count { it.displayName.equals(entry.displayName) } > 0
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
