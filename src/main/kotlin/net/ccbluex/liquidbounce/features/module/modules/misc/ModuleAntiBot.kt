@@ -81,7 +81,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     private fun isADuplicate(entry: PlayerListS2CPacket.Entry): Boolean {
-        return world.players.count { it.displayName.equals(entry.displayName) } > 0
+        return world.entities.count { it is PlayerEntity && it.displayName == entry.displayName || it.displayName.asString() == entry.displayName.toString() } > 0
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
