@@ -34,6 +34,7 @@
     "minecraft.gui.MixinSharedConstants",
     "minecraft.gui.MixinSplashOverlay",
     "minecraft.gui.MixinGenericContainerScreen",
+    "minecraft.gui.MixinGenericContainerScreenHandler",
     "minecraft.network.MixinClientConnection",
     "minecraft.network.MixinClientPlayerInteractionManager",
     "minecraft.network.MixinClientPlayNetworkHandler",
