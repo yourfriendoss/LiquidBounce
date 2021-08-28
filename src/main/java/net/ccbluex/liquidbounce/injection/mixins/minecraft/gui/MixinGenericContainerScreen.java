@@ -18,7 +18,6 @@ public class MixinGenericContainerScreen {
         if (ModuleChestStealer.INSTANCE.getEnabled() && mc.currentScreen instanceof GenericContainerScreen) {
             mc.windowFocused = true;
             mc.mouse.lockCursor();
-            mc.currentScreen = null;
             ci.cancel();
         }
     }
