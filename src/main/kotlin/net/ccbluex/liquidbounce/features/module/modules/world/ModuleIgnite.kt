@@ -26,7 +26,7 @@ import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.raytraceBlock
 import net.ccbluex.liquidbounce.utils.block.getCenterDistanceSquared
 import net.ccbluex.liquidbounce.utils.block.getState
-import net.ccbluex.liquidbounce.utils.block.searchBlocksInRadius
+import net.ccbluex.liquidbounce.utils.block.searchBlocksInCuboid
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.entity.eyesPos
 import net.ccbluex.liquidbounce.utils.entity.getNearestPoint
@@ -114,9 +114,9 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
 
         val radius = 6.0f + 1
         val radiusSquared = radius * radius
-        val eyesPos = player.eyesPos
+        val eyesPos = mc.player!!.eyesPos
 
-        val blockToProcess = searchBlocksInRadius(radius) { _, _ ->
+        val blockToProcess = searchBlocksInCuboid(radius.toInt()) { _, _ ->
             !entity.blockStateAtPos.isAir && getNearestPoint(
                 eyesPos,
                 Box(entity.blockPos, entity.blockPos.add(1, 1, 1))
@@ -137,11 +137,12 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
         if (rt != null) {
             val (rotation, _) = rt
             RotationManager.aimAt(rotation, configurable = rotations)
+
             currentBlock = pos
             return
         }
 
-        val raytraceResult = world.raycast(
+        val raytraceResult = mc.world?.raycast(
             RaycastContext(
                 player.eyesPos,
                 Vec3d.of(pos).add(0.5, 0.5, 0.5),
