@@ -5,7 +5,7 @@ mutable field net/minecraft/client/MinecraftClient session Lnet/minecraft/client
 accessible field net/minecraft/client/MinecraftClient sessionService Lcom/mojang/authlib/minecraft/MinecraftSessionService;
 mutable field net/minecraft/client/MinecraftClient sessionService Lcom/mojang/authlib/minecraft/MinecraftSessionService;
 
-accessable field net/minecraft/client/MinecraftClient windowFocused Z
+accessible field net/minecraft/client/MinecraftClient windowFocused Z
 
 mutable field net/minecraft/item/ItemGroup GROUPS [Lnet/minecraft/item/ItemGroup;
 
