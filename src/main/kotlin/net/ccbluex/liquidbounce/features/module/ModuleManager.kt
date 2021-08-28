@@ -171,7 +171,6 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleAntiBot,
             ModulePacketReader,
             ModuleKeepAlive,
-            ModuleKeepContainer,
             ModuleNoFriends
         )
 
