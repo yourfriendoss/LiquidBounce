@@ -21,140 +21,92 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager
-import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
-import net.ccbluex.liquidbounce.utils.aiming.raytraceBlock
-import net.ccbluex.liquidbounce.utils.block.getCenterDistanceSquared
+import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
+import net.ccbluex.liquidbounce.utils.aiming.raycast
 import net.ccbluex.liquidbounce.utils.block.getState
-import net.ccbluex.liquidbounce.utils.block.searchBlocksInCuboid
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
-import net.ccbluex.liquidbounce.utils.entity.eyesPos
-import net.ccbluex.liquidbounce.utils.entity.getNearestPoint
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.entity.Entity
+import net.minecraft.block.Blocks
+import net.minecraft.item.ItemUsageContext
 import net.minecraft.item.Items
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.RaycastContext
 
 /**
- * BlockTrap module
+ * Ignite module
  *
- * Automatically traps players around you.
+ * Automatically sets targets around you on fire.
  */
-object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
+object ModuleIgnite : Module("Ignite", Category.WORLD) {
 
-    var delay by int("Delay", 20, 0..40)
+    var delay by int("Delay", 20, 0..400)
 
     // Target
     private val targetTracker = tree(TargetTracker())
 
-    // Rotations
-    private val rotations = tree(RotationsConfigurable())
-
-    private var currentBlock: BlockPos? = null
-
-    val networkTickHandler = repeatable {
+    val networkTickHandler = repeatable { event ->
         val player = mc.player ?: return@repeatable
 
-        val slot = findHotbarSlot(Items.FLINT_AND_STEEL) ?: return@repeatable
+        val slot = findHotbarSlot(Items.LAVA_BUCKET) ?: return@repeatable
 
         for (enemy in targetTracker.enemies()) {
             if (enemy.squaredBoxedDistanceTo(player) > 6.0 * 6.0) {
                 continue
             }
 
-            if (enemy.isOnFire) {
+            val pos = enemy.blockPos
+
+            val state = pos.getState()
+
+            if (state?.block == Blocks.LAVA) {
                 continue
             }
 
-            updateTarget(enemy)
+            val currentTarget = updateTarget(pos, true) ?: continue
 
-            val curr = currentBlock ?: return@repeatable
-            val serverRotation = RotationManager.serverRotation ?: return@repeatable
+            val rotation = currentTarget.rotation.fixedSensitivity() ?: continue
+            val rayTraceResult = raycast(4.5, rotation) ?: return@repeatable
 
-            val rayTraceResult = raytraceBlock(
-                6.0,
-                serverRotation,
-                curr,
-                curr.getState() ?: return@repeatable
-            )
-
-            if (rayTraceResult?.type != HitResult.Type.BLOCK || rayTraceResult.blockPos != curr) {
-                return@repeatable
+            if (rayTraceResult.type != HitResult.Type.BLOCK) {
+                continue
             }
+
+            player.networkHandler.sendPacket(PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, player.isOnGround))
 
             if (slot != player.inventory.selectedSlot) {
-                network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
+                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(slot))
             }
 
-            if (interaction.interactBlock(player, world, Hand.MAIN_HAND, rayTraceResult) == ActionResult.SUCCESS) {
+            player.networkHandler.sendPacket(PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, rayTraceResult))
+            val itemUsageContext = ItemUsageContext(player, Hand.MAIN_HAND, rayTraceResult)
+
+            val itemStack = player.inventory.getStack(slot)
+
+            val actionResult: ActionResult
+
+            if (player.isCreative) {
+                val i = itemStack.count
+                actionResult = itemStack.useOnBlock(itemUsageContext)
+                itemStack.count = i
+            } else {
+                actionResult = itemStack.useOnBlock(itemUsageContext)
+            }
+
+            if (actionResult.shouldSwingHand()) {
                 player.swingHand(Hand.MAIN_HAND)
             }
 
             if (slot != player.inventory.selectedSlot) {
-                network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
+                player.networkHandler.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
             }
 
-            wait(delay)
-
-            return@repeatable
+            break
         }
 
-    }
-
-    private fun updateTarget(entity: Entity) {
-        currentBlock = null
-
-        val radius = 6.0f + 1
-        val radiusSquared = radius * radius
-        val eyesPos = mc.player!!.eyesPos
-
-        val blockToProcess = searchBlocksInCuboid(radius.toInt()) { _, _ ->
-            !entity.blockStateAtPos.isAir && getNearestPoint(
-                eyesPos,
-                Box(entity.blockPos, entity.blockPos.add(1, 1, 1))
-            ).squaredDistanceTo(eyesPos) <= radiusSquared
-        }.minByOrNull { it.first.getCenterDistanceSquared() } ?: return
-
-        val (pos, state) = blockToProcess
-
-        val rt = RotationManager.raytraceBlock(
-            player.eyesPos,
-            pos,
-            state,
-            range = 6.0,
-            wallsRange = 0.0
-        )
-
-        // We got a free angle at the block? Cool.
-        if (rt != null) {
-            val (rotation, _) = rt
-            RotationManager.aimAt(rotation, configurable = rotations)
-
-            currentBlock = pos
-            return
-        }
-
-        val raytraceResult = mc.world?.raycast(
-            RaycastContext(
-                player.eyesPos,
-                Vec3d.of(pos).add(0.5, 0.5, 0.5),
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE,
-                player
-            )
-        ) ?: return
-
-        // Failsafe. Should not trigger
-        if (raytraceResult.type != HitResult.Type.BLOCK) return
-
-        currentBlock = raytraceResult.blockPos
     }
 }
