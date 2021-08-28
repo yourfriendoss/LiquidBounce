@@ -68,7 +68,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     }
                 } else {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                    notification("AntiBot", "Removed dupe $pName", NotificationEvent.Severity.INFO)
                     pName = null
                 }
             }
