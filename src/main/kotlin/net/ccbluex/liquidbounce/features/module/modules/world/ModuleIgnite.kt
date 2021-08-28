@@ -21,7 +21,9 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.currentTarget
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
+import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.aiming.raycast
@@ -35,6 +37,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
 
 /**
@@ -55,22 +58,18 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
     val networkTickHandler = repeatable {
         val player = mc.player ?: return@repeatable
 
-        val slot = findHotbarSlot(arrayListOf(Items.LAVA_BUCKET, Items.FLINT_AND_STEEL, Items.COBWEB)) ?: return@repeatable
+        val slot = findHotbarSlot(Items.FLINT_AND_STEEL) ?: return@repeatable
 
         for (enemy in targetTracker.enemies()) {
             if (enemy.squaredBoxedDistanceTo(player) > 6.0 * 6.0) {
                 continue
             }
 
-            val pos = enemy.blockPos
-
-            val state = pos.getState()
-
-            if (enemy.isOnFire || state?.block is CobwebBlock) {
+            if (enemy.isOnFire) {
                 continue
             }
 
-            val currentTarget = updateTarget(pos, true) ?: continue
+            val currentTarget = updateTarget(enemy.blockPos, true) ?: continue
 
             val rotation = currentTarget.rotation.fixedSensitivity() ?: continue
             val rayTraceResult = raycast(4.5, rotation) ?: return@repeatable
@@ -79,17 +78,13 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
                 continue
             }
 
-            RotationManager.aimAt(rotation, configurable = rotations)
-
             if (slot != player.inventory.selectedSlot) {
                 network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
             }
 
+            RotationManager.aimAt(Rotation(rotation.yaw, rotation.pitch), configurable = rotations)
+
             if (interaction.interactBlock(player, world, Hand.MAIN_HAND, rayTraceResult) == ActionResult.SUCCESS) {
-                if (player.inventory.getStack(slot).item == Items.LAVA_BUCKET) {
-                    network.sendPacket(PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, rayTraceResult))
-                    player.swingHand(Hand.MAIN_HAND)
-                }
                 player.swingHand(Hand.MAIN_HAND)
             }
 
@@ -97,7 +92,9 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
                 network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
             }
 
-            break
+            wait(delay)
+
+            return@repeatable
         }
 
     }
