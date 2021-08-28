@@ -21,24 +21,19 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.currentTarget
-import net.ccbluex.liquidbounce.features.module.modules.world.ModuleScaffold.updateTarget
-import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
-import net.ccbluex.liquidbounce.utils.aiming.raycast
-import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
+import net.ccbluex.liquidbounce.utils.entity.eyesPos
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.CobwebBlock
 import net.minecraft.item.Items
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.Vec3d
+import net.minecraft.world.RaycastContext
 
 /**
  * BlockTrap module
@@ -69,12 +64,25 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
                 continue
             }
 
-            val currentTarget = updateTarget(enemy.blockPos, true) ?: continue
+            val (rotation, _) = RotationManager.raytraceBlock(
+                player.eyesPos,
+                enemy.blockPos,
+                enemy.blockStateAtPos,
+                range = 6.0,
+                wallsRange = 0.0
+            ) ?: continue
 
-            val rotation = currentTarget.rotation.fixedSensitivity() ?: continue
-            val rayTraceResult = raycast(4.5, rotation) ?: return@repeatable
+            val raytraceResult = mc.world?.raycast(
+                RaycastContext(
+                    player.eyesPos,
+                    Vec3d.of(enemy.blockPos).add(0.5, 0.5, 0.5),
+                    RaycastContext.ShapeType.COLLIDER,
+                    RaycastContext.FluidHandling.NONE,
+                    player
+                )
+            ) ?: return@repeatable
 
-            if (rayTraceResult.type != HitResult.Type.BLOCK) {
+            if (raytraceResult.type != HitResult.Type.BLOCK) {
                 continue
             }
 
@@ -82,9 +90,9 @@ object ModuleIgnite : Module("BlockTrap", Category.WORLD) {
                 network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
             }
 
-            RotationManager.aimAt(Rotation(rotation.yaw, rotation.pitch), configurable = rotations)
+            RotationManager.aimAt(rotation, configurable = rotations)
 
-            if (interaction.interactBlock(player, world, Hand.MAIN_HAND, rayTraceResult) == ActionResult.SUCCESS) {
+            if (interaction.interactBlock(player, world, Hand.MAIN_HAND, raytraceResult) == ActionResult.SUCCESS) {
                 player.swingHand(Hand.MAIN_HAND)
             }
 
