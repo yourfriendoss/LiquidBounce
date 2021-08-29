@@ -30,7 +30,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             when (packet.action) {
                 PlayerListS2CPacket.Action.ADD_PLAYER -> {
                     for (entry in packet.entries) {
-                        if (entry.profile.name.length < 3 || entry.displayName != null) {
+                        if (entry.profile.name.length < 3) {
                             continue
                         }
 
