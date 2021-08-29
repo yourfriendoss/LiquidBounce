@@ -6,9 +6,9 @@ import com.mojang.authlib.GameProfile
 import net.ccbluex.liquidbounce.event.NotificationEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.utils.client.StateUpdateEvent
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
@@ -55,9 +55,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    val repeatable = handler<StateUpdateEvent> {
+    val repeatable = repeatable {
         if (mc.world == null || mc.player == null || pName == null) {
-            return@handler
+            return@repeatable
         }
 
         for (entity in world.entities) {
