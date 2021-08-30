@@ -77,7 +77,10 @@ object ModuleAutoGapple : Module("AutoGapple", Category.COMBAT) {
                     prevSlot = player.inventory.selectedSlot
                     saveSlot = true
                 }
+
                 player.inventory.selectedSlot = slot
+
+                wait(2)
                 eating = true
                 mc.options.keyUse.isPressed = true
             } else {
