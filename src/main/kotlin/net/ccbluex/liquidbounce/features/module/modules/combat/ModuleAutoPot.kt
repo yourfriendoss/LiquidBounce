@@ -74,7 +74,7 @@ object ModuleAutoPot : Module("AutoPot", Category.COMBAT) {
             if (potHotBar != null) {
                 val collisionBlock = FallingPlayer.fromPlayer(player).findCollision(20)?.pos
 
-                if (player.y - collisionBlock!!.y > groundDistance) {
+                if (player.y - (collisionBlock?.y ?: 0) > groundDistance) {
                     return@repeatable
                 }
 
