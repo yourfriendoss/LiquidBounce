@@ -54,7 +54,7 @@ object ModuleAutoFarm : Module("AutoFarm", Category.WORLD) {
 
     private var currentTarget: BlockPos? = null
 
-    val networkTickHandler = repeatable { event ->
+    val networkTickHandler = repeatable {
         if (mc.currentScreen is HandledScreen<*>) {
             return@repeatable
         }
@@ -94,17 +94,17 @@ object ModuleAutoFarm : Module("AutoFarm", Category.WORLD) {
     }
 
     private fun updateTarget() {
-        this.currentTarget = null
+        currentTarget = null
 
         val radius = range + 1
         val radiusSquared = radius * radius
         val eyesPos = mc.player!!.eyesPos
 
         val blockToProcess = searchBlocksInCuboid(radius.toInt()) { pos, state ->
-            !state.isAir && getNearestPoint(
+            !state.isAir && isTargeted(state, pos) && getNearestPoint(
                 eyesPos,
                 Box(pos, pos.add(1, 1, 1))
-            ).squaredDistanceTo(eyesPos) <= radiusSquared && isTargeted(state, pos)
+            ).squaredDistanceTo(eyesPos) <= radiusSquared
         }.minByOrNull { it.first.getCenterDistanceSquared() } ?: return
 
         val (pos, state) = blockToProcess
@@ -122,7 +122,7 @@ object ModuleAutoFarm : Module("AutoFarm", Category.WORLD) {
             val (rotation, _) = rt
             RotationManager.aimAt(rotation, configurable = rotations)
 
-            this.currentTarget = pos
+            currentTarget = pos
             return
         }
 
@@ -139,13 +139,12 @@ object ModuleAutoFarm : Module("AutoFarm", Category.WORLD) {
         // Failsafe. Should not trigger
         if (raytraceResult.type != HitResult.Type.BLOCK) return
 
-        this.currentTarget = raytraceResult.blockPos
+        currentTarget = raytraceResult.blockPos
     }
 
     private fun isTargeted(state: BlockState, pos: BlockPos): Boolean {
-        val block = state.block
 
-        return when (block) {
+        return when (val block = state.block) {
             is GourdBlock -> true
             is CropBlock -> block.isMature(state)
             is NetherWartBlock -> state.get(NetherWartBlock.AGE) >= 3
