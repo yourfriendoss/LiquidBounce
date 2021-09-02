@@ -32,9 +32,6 @@ public abstract class MixinInGameOverlayRenderer implements IMixinGameRenderer {
 
     @Redirect(method = "renderFireOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"))
     private static VertexConsumer injectFireOpacity(VertexConsumer vertexConsumer, float red, float green, float blue, float alpha) {
-        return vertexConsumer.color(red,
-                                    green,
-                                    blue,
-                                    ModuleAntiBlind.INSTANCE.getEnabled() ? ModuleAntiBlind.INSTANCE.getFireOpacity() * alpha : alpha);
+        return vertexConsumer.color(red, green, blue, ModuleAntiBlind.INSTANCE.getEnabled() ? ModuleAntiBlind.INSTANCE.getFireOpacity() * alpha : alpha);
     }
 }
