@@ -41,14 +41,6 @@ public class MixinInGameHud {
      */
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V", shift = At.Shift.AFTER), cancellable = true)
     private void hookRenderEvent(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (ModuleAntiBlind.INSTANCE.getEnabled()) {
-            if (this.client.options.getPerspective().isFirstPerson()) {
-                ItemStack itemStack = this.client.player.getInventory().getArmorStack(3);
-                if (itemStack.isOf(Blocks.CARVED_PUMPKIN.asItem())) {
-                    ci.cancel();
-                }
-            }
-        }
         EventManager.INSTANCE.callEvent(new OverlayRenderEvent(matrices, tickDelta));
     }
 
