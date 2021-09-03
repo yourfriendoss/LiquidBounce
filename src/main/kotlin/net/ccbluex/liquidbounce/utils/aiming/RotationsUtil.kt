@@ -102,9 +102,9 @@ object RotationManager : Listenable {
             for (y in 0.1..0.9 step 0.1) {
                 for (z in 0.1..0.9 step 0.1) {
                     val vec3 = Vec3d(
-                        box.maxX * x,
-                        box.maxY * y,
-                        box.maxZ * z
+                        box.minX + (box.maxX - box.minX) * x,
+                        box.minY + (box.maxY - box.minY) * y,
+                        box.minZ + (box.maxZ - box.minZ) * z
                     )
 
                     // skip because of out of range
