@@ -171,7 +171,8 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleAntiBot,
             ModulePacketReader,
             ModuleKeepAlive,
-            ModuleNoFriends
+            ModuleNoFriends,
+            ModuleProjectilePuncher
         )
 
         builtin.apply {
