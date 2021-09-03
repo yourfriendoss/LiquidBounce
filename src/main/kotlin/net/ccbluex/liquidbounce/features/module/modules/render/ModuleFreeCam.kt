@@ -68,7 +68,7 @@ object ModuleFreeCam : Module("FreeCam", Category.RENDER) {
 
         faker.headYaw = player.headYaw
         faker.copyPositionAndRotation(player)
-        world.addEntity(faker.id, faker)
+        world.addPlayer(faker.id, faker)
         fakePlayer = faker
 
         if (!collision) {
@@ -78,7 +78,7 @@ object ModuleFreeCam : Module("FreeCam", Category.RENDER) {
 
     override fun disable() {
         player.updatePositionAndAngles(fakePlayer!!.x, fakePlayer!!.y, fakePlayer!!.z, player.yaw, player.pitch)
-        world.removeEntity(fakePlayer!!.id, Entity.RemovalReason.UNLOADED_TO_CHUNK)
+        world.removeEntity(fakePlayer!!.id, Entity.RemovalReason.DISCARDED)
         fakePlayer = null
         player.setVelocity(x, y, z)
     }

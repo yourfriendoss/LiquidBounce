@@ -85,7 +85,7 @@ object ModuleBlink : Module("Blink", Category.PLAYER) {
 
             faker.headYaw = player.headYaw
             faker.copyPositionAndRotation(player)
-            world.addEntity(faker.id, faker)
+            world.addPlayer(faker.id, faker)
 
             fakeplayer = faker
         }
@@ -124,7 +124,7 @@ object ModuleBlink : Module("Blink", Category.PLAYER) {
         val faker = this.fakeplayer
 
         if (faker != null) {
-            world.removeEntity(faker.id, Entity.RemovalReason.UNLOADED_TO_CHUNK)
+            world.removeEntity(faker.id, Entity.RemovalReason.DISCARDED)
 
             this.fakeplayer = null
         }
