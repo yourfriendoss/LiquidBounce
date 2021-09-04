@@ -72,6 +72,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     EventManager.callEvent(PlayerListEvent(PlayerListS2CPacket.Action.REMOVE_PLAYER, entryName!!))
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
+                    entryName = null
                 }
                 break
             }
