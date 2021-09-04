@@ -9,7 +9,6 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
-import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 
@@ -25,24 +24,14 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         if (packet is PlayerListS2CPacket) {
             when (packet.action) {
                 PlayerListS2CPacket.Action.ADD_PLAYER -> {
-                    for (entity in network.playerList) {
-                        for (entry in packet.entries) {
-                            if (entry.profile.name.length < 3) {
-                                continue
-                            }
+                    for (entry in packet.entries) {
+                        if (entry.profile.name.length < 3) {
+                            continue
+                        }
 
-                            if (isADuplicate(entry.profile) || (entity is PlayerEntity && entity.entityName == entry.profile.name && (isArmored(
-                                    entity
-                                ) || entity.ping > 1))
-                            ) {
-                                event.cancelEvent()
-                                notification(
-                                    "AntiBot",
-                                    "Removed ${entry.profile.name}",
-                                    NotificationEvent.Severity.INFO
-                                )
-                                continue
-                            }
+                        if (isADuplicate(entry.profile) || (armor(entry.profile) || entry.latency > 1)) {
+                            event.cancelEvent()
+                            notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                         }
                     }
                 }
@@ -74,6 +63,15 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private fun isADuplicate(profile: GameProfile): Boolean {
         return network.playerList.count { it.profile.name == profile.name } > 0
+    }
+
+    private fun armor(entry: GameProfile) : Boolean {
+        network.playerList.filter { it.profile.name == entry.name }.forEach { entity ->
+            if (entity is PlayerEntity) {
+                return isArmored(entity)
+            }
+        }
+        return false
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
