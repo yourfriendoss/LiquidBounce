@@ -3,21 +3,18 @@
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import com.mojang.authlib.GameProfile
-import net.ccbluex.liquidbounce.event.NotificationEvent
-import net.ccbluex.liquidbounce.event.PacketEvent
-import net.ccbluex.liquidbounce.event.handler
-import net.ccbluex.liquidbounce.event.repeatable
+import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
+import net.minecraft.network.packet.s2c.play.*
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
-    private var pName: String? = null
+    var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) {
@@ -69,6 +66,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (pName != null) {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                    entity.entityWorld.getEntityById(entity.id)!!.setRemoved(Entity.RemovalReason.DISCARDED)
+                    entity.entityWorld.getEntityById(entity.id)!!.remove(Entity.RemovalReason.DISCARDED)
+                    entity.entityWorld.disconnect()
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
                 }

@@ -78,4 +78,5 @@ public abstract class MixinPlayerListEntry {
         callbackInfo.setReturnValue(elytraTexture);
     }
 
+
 }

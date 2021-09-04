@@ -46,12 +46,8 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.AxeItem
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.GameMode
 
