@@ -11,6 +11,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
+import net.minecraft.client.network.PlayerListEntry
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
@@ -18,6 +19,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
+    private var entryName: PlayerListS2CPacket.Entry? = null
 
     val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) {
@@ -37,15 +39,18 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                         if (isADuplicate(entry.profile)) {
                             event.cancelEvent()
                             notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
-                        } else {
-                            pName = entry.profile.name
+                            continue
                         }
+
+                        pName = entry.profile.name
+                        entryName = entry
                     }
                 }
                 PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
                     for (entry in packet.entries) {
                         if (entry.profile.name == pName) {
                             pName = null
+                            entryName = null
                         }
                     }
                 }
@@ -56,7 +61,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     val repeatable = repeatable {
-        if (mc.world == null || mc.player == null || pName == null) {
+        if (mc.world == null || mc.player == null || pName == null || entryName == null) {
             return@repeatable
         }
 
@@ -68,8 +73,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (pName != null) {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                    network.playerList.remove(PlayerListEntry(entryName))
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
+                    entryName = null
                 }
                 break
             }
