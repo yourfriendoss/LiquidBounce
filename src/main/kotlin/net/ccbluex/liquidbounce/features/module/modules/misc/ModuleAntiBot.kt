@@ -3,18 +3,17 @@
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import com.mojang.authlib.GameProfile
-import net.ccbluex.liquidbounce.event.*
+import net.ccbluex.liquidbounce.event.NotificationEvent
+import net.ccbluex.liquidbounce.event.PacketEvent
+import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
-import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
-
-    var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) {
@@ -26,24 +25,24 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         if (packet is PlayerListS2CPacket) {
             when (packet.action) {
                 PlayerListS2CPacket.Action.ADD_PLAYER -> {
-                    for (entry in packet.entries) {
-                        if (entry.profile.name.length < 3) {
-                            continue
-                        }
+                    for (entity in network.playerList) {
+                        for (entry in packet.entries) {
+                            if (entry.profile.name.length < 3) {
+                                continue
+                            }
 
-                        if (isADuplicate(entry.profile)) {
-                            event.cancelEvent()
-                            notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
-                            continue
-                        }
-
-                        pName = entry.profile.name
-                    }
-                }
-                PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
-                    for (entry in packet.entries) {
-                        if (entry.profile.name == pName) {
-                            pName = null
+                            if (isADuplicate(entry.profile) || (entity is PlayerEntity && entity.entityName == entry.profile.name && (isArmored(
+                                    entity
+                                ) || entity.ping > 1))
+                            ) {
+                                event.cancelEvent()
+                                notification(
+                                    "AntiBot",
+                                    "Removed ${entry.profile.name}",
+                                    NotificationEvent.Severity.INFO
+                                )
+                                continue
+                            }
                         }
                     }
                 }
@@ -53,29 +52,25 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    val repeatable = repeatable {
-        if (mc.world == null || mc.player == null || pName == null) {
-            return@repeatable
-        }
+    /* val repeatable = repeatable {
+         if (mc.world == null || mc.player == null || pName == null) {
+             return@repeatable
+         }
 
-        for (entity in world.entities) {
-            if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity) || entity.ping < 2) {
-                    pName = null
-                }
+         for (entity in world.entities) {
+             if (entity is PlayerEntity && entity.entityName == pName) {
+                 if (!isArmored(entity) || entity.ping < 2) {
+                     pName = null
+                 }
 
-                if (pName != null) {
-                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    entity.entityWorld.getEntityById(entity.id)!!.setRemoved(Entity.RemovalReason.DISCARDED)
-                    entity.entityWorld.getEntityById(entity.id)!!.remove(Entity.RemovalReason.DISCARDED)
-                    entity.entityWorld.disconnect()
-                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
-                    pName = null
-                }
-                break
-            }
-        }
-    }
+                 if (pName != null) {
+                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                     pName = null
+                 }
+                 break
+             }
+         }*/
 
     private fun isADuplicate(profile: GameProfile): Boolean {
         return network.playerList.count { it.profile.name == profile.name } > 0
