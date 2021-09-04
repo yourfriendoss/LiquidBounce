@@ -16,7 +16,6 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
-    private var entryName: PlayerListS2CPacket.Entry? = null
 
     val packetHandler = handler<PacketEvent> { event ->
         if (mc.world == null || mc.player == null) {
@@ -39,7 +38,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                             }
 
                             pName = entry.profile.name
-                            entryName = entry
                         }
                     }
                     PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
@@ -69,10 +67,8 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (pName != null) {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    EventManager.callEvent(PlayerListEvent(PlayerListS2CPacket.Action.REMOVE_PLAYER, listOf(entryName!!)))
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
-                    entryName = null
                 }
                 break
             }
