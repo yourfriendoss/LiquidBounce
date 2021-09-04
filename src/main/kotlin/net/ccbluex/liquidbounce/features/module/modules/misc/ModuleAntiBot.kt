@@ -69,7 +69,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (pName != null) {
                     world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    EventManager.callEvent(PlayerListEvent(PlayerListS2CPacket.Action.REMOVE_PLAYER, entryName!!))
+                    EventManager.callEvent(PlayerListEvent(PlayerListS2CPacket.Action.REMOVE_PLAYER, listOf(entryName!!)))
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
                     entryName = null

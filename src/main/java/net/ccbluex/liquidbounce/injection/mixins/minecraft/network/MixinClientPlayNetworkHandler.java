@@ -50,6 +50,6 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onPlayerList", at = @At("RETURN"))
     private void injectPlayerList(PlayerListS2CPacket packet, CallbackInfo ci) {
-        EventManager.INSTANCE.callEvent(new PlayerListEvent(packet.getAction(), packet.getEntries().get(0)));
+        EventManager.INSTANCE.callEvent(new PlayerListEvent(packet.getAction(), packet.getEntries()));
     }
 }

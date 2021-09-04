@@ -58,7 +58,7 @@ class WorldDisconnectEvent : Event()
 class HealthUpdateEvent(val health: Float, val food: Int, val saturation: Float) : Event()
 
 @Nameable("playerListEvent")
-class PlayerListEvent(val action: PlayerListS2CPacket.Action, val entry: PlayerListS2CPacket.Entry) : Event()
+class PlayerListEvent(val action: PlayerListS2CPacket.Action, val entry: List<PlayerListS2CPacket.Entry>) : Event()
 
 
 @Nameable("gameRender")
