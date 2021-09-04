@@ -30,6 +30,7 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
 import net.minecraft.entity.MovementType
 import net.minecraft.network.Packet
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.shape.VoxelShape
@@ -55,6 +56,10 @@ class WorldDisconnectEvent : Event()
 
 @Nameable("healthUpdateEvent")
 class HealthUpdateEvent(val health: Float, val food: Int, val saturation: Float) : Event()
+
+@Nameable("playerListEvent")
+class PlayerListEvent(val action: PlayerListS2CPacket.Action, val entry: PlayerListS2CPacket.Entry) : Event()
+
 
 @Nameable("gameRender")
 class GameRenderEvent : Event()
