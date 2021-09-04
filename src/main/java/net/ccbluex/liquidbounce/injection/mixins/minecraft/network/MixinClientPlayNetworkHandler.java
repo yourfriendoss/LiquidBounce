@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class MixinClientPlayNetworkHandler {
+public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onChunkData", at = @At("RETURN"))
     private void injectChunkLoadEvent(ChunkDataS2CPacket packet, CallbackInfo ci) {
@@ -49,5 +49,4 @@ public class MixinClientPlayNetworkHandler {
     private void injectHealthUpdate(HealthUpdateS2CPacket packet, CallbackInfo ci) {
         EventManager.INSTANCE.callEvent(new HealthUpdateEvent(packet.getHealth(), packet.getFood(), packet.getSaturation()));
     }
-
 }
