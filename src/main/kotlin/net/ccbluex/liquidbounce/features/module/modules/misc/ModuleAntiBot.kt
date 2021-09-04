@@ -68,7 +68,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                 }
 
                 if (pName != null) {
-                    world.removeEntity(entity.id, Entity.RemovalReason.UNLOADED_TO_CHUNK)
+                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
                     notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                     pName = null
                 }
