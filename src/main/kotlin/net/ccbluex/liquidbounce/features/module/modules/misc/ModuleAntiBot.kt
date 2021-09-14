@@ -3,10 +3,12 @@
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import com.mojang.authlib.GameProfile
-import net.ccbluex.liquidbounce.event.*
+import net.ccbluex.liquidbounce.event.NotificationEvent
+import net.ccbluex.liquidbounce.event.PacketEvent
+import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.utils.client.StateUpdateEvent
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
@@ -18,9 +20,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     private var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
-        if (mc.world == null || mc.player == null) {
-            return@handler
-        }
 
         when (val packet = event.packet) {
             is PlayerListS2CPacket -> {
@@ -33,7 +32,11 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                             if (isADuplicate(entry.profile)) {
                                 event.cancelEvent()
-                                notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                                notification(
+                                    "AntiBot",
+                                    "Removed ${entry.profile.name}",
+                                    NotificationEvent.Severity.INFO
+                                )
                                 continue
                             }
 
@@ -54,9 +57,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    val repeatable = handler<StateUpdateEvent> {
-        if (mc.world == null || pName == null) {
-            return@handler
+    val repeatable = repeatable {
+        if (pName == null) {
+            return@repeatable
         }
 
         for (entity in world.entities) {
