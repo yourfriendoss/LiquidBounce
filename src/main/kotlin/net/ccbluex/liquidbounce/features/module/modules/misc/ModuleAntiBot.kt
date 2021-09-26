@@ -26,7 +26,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
 
-    private val uuidNameCache = mutableListOf<UUID>()
+    private val uuidNameCache = hashMapOf<UUID, String>()
 
     override fun disable() {
         uuidNameCache.clear()
@@ -102,8 +102,8 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    private fun isADuplicate(profile: GameProfile): Boolean {
-        return network.playerList.count { it.profile.name == profile.name } > 0
+    private fun isADuplicate(name: String): Boolean {
+        return network.playerList.count { it.profile.name == name } > 0
     }
 
     private fun isArmored(entity: PlayerEntity): Boolean {
@@ -127,34 +127,21 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         return names.get(names.size() - 1).asJsonObject.get("name").asString
     }
 
-    fun getUsername(uuid: MutableList<UUID>): String? {
-        val client = HttpClients.createDefault()
-        val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
-        val response = client.execute(request)
-
-        if (response.statusLine.statusCode != 200) {
-            return null
-        }
-
-        val names = JsonParser().parse(EntityUtils.toString(response.entity)).asJsonArray
-
-        return names.get(names.size() - 1).asJsonObject.get("name").asString
-    }
 
     fun startChecking(uuid: UUID) {
         uuidNameCache.clear()
 
-        uuidNameCache.add(uuid)
+        uuidNameCache[uuid] = getUsername(uuid)!!
 
-        for (entity in world.entities) {
-            if (entity.uuid != uuid) {
-                uuidNameCache.add(entity.uuid)
+        for (id in network.playerList) {
+            if (id.profile.id != uuid) {
+                uuidNameCache[id.profile.id] = id.profile.name
             }
 
-            if (getUsername(uuidNameCache) == getUsername(uuid)) {
-                chat("${getUsername(uuidNameCache)} == ${getUsername(uuid)}")
-                break
+            if (id.profile.name == getUsername(uuid)) {
+                chat("${id.profile.name} == ${getUsername(uuid)}")
             }
         }
+
     }
 }
