@@ -47,8 +47,8 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
-                            startChecking(entry.profile.id)
-                            /* for (entity in world.entities) {
+                            /*startChecking(entry.profile.id)
+                             for (entity in world.entities) {
                                  if (entity is PlayerEntity && entity.entityName == getUsername(entry.profile.id)) {
                                      chat("${getUsername(entry.profile.id)} == ${entity.entityName}")
                                  }
@@ -81,7 +81,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    val repeatable = repeatable {
+/*    val repeatable = repeatable {
         if (pName == null) {
             return@repeatable
         }
@@ -100,7 +100,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                 break
             }
         }
-    }
+    }*/
 
     private fun isADuplicate(name: String): Boolean {
         return network.playerList.count { it.profile.name == name } > 0
@@ -128,20 +128,17 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
 
-    fun startChecking(uuid: UUID) {
+    /*fun startChecking(uuid: UUID) {
         uuidNameCache.clear()
 
         uuidNameCache[uuid] = getUsername(uuid)!!
 
-        for (id in network.playerList) {
-            if (id.profile.id != uuid) {
-                uuidNameCache[id.profile.id] = id.profile.name
-            }
-
-            if (uuidNameCache.containsValue(getUsername(uuid))) {
-                chat("${id.profile.name} == ${getUsername(uuid)}")
+        for (id in network.playerUuids) {
+            if (id != uuid) {
+                uuidNameCache[id] = getUsername(id)!!
             }
         }
 
-    }
+        if (uuidNameCache.)
+    }*/
 }
