@@ -64,7 +64,7 @@ object ModuleMobOwners : Module("MobOwners", Category.RENDER) {
             ?: getFromMojangApi(ownerId)
     }
 
-    private fun getFromMojangApi(ownerId: UUID): OrderedText {
+    fun getFromMojangApi(ownerId: UUID): OrderedText {
         return uuidNameCache.computeIfAbsent(ownerId) {
             this.asyncRequestExecutor.submit {
                 try {
