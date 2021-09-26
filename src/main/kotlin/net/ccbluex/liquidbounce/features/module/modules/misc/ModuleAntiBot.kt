@@ -26,6 +26,16 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
 
+    private val uuidNameCache = mutableListOf<UUID>()
+
+    override fun disable() {
+        uuidNameCache.clear()
+    }
+
+    override fun enable() {
+        uuidNameCache.clear()
+    }
+
     val packetHandler = handler<PacketEvent> { event ->
 
         when (val packet = event.packet) {
@@ -37,23 +47,24 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
-                            for (entity in world.entities) {
-                                if (entity is PlayerEntity && entity.entityName == getUsername(entry.profile.id)) {
-                                    chat("${getUsername(entry.profile.id)} == ${entity.entityName}")
-                                }
-                            }
+                            startChecking(entry.profile.id)
+                            /* for (entity in world.entities) {
+                                 if (entity is PlayerEntity && entity.entityName == getUsername(entry.profile.id)) {
+                                     chat("${getUsername(entry.profile.id)} == ${entity.entityName}")
+                                 }
+                             }
 
-                            if (isADuplicate(entry.profile)) {
-                                event.cancelEvent()
-                                notification(
-                                    "AntiBot",
-                                    "Removed ${entry.profile.name}",
-                                    NotificationEvent.Severity.INFO
-                                )
-                                continue
-                            }
+                             if (isADuplicate(entry.profile)) {
+                                 event.cancelEvent()
+                                 notification(
+                                     "AntiBot",
+                                     "Removed ${entry.profile.name}",
+                                     NotificationEvent.Severity.INFO
+                                 )
+                                 continue
+                             }
 
-                            pName = entry.profile.name
+                             pName = entry.profile.name*/
                         }
                     }
                     PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
@@ -114,5 +125,36 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         val names = JsonParser().parse(EntityUtils.toString(response.entity)).asJsonArray
 
         return names.get(names.size() - 1).asJsonObject.get("name").asString
+    }
+
+    fun getUsername(uuid: MutableList<UUID>): String? {
+        val client = HttpClients.createDefault()
+        val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
+        val response = client.execute(request)
+
+        if (response.statusLine.statusCode != 200) {
+            return null
+        }
+
+        val names = JsonParser().parse(EntityUtils.toString(response.entity)).asJsonArray
+
+        return names.get(names.size() - 1).asJsonObject.get("name").asString
+    }
+
+    fun startChecking(uuid: UUID) {
+        uuidNameCache.clear()
+
+        uuidNameCache.add(uuid)
+
+        for (entity in world.entities) {
+            if (entity.uuid != uuid) {
+                uuidNameCache.add(entity.uuid)
+            }
+
+            if (getUsername(uuidNameCache) == getUsername(uuid)) {
+                chat("${getUsername(uuidNameCache)} == ${getUsername(uuid)}")
+                break
+            }
+        }
     }
 }
