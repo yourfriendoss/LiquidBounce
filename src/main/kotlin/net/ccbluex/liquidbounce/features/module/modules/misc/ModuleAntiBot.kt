@@ -138,7 +138,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                 uuidNameCache[id.profile.id] = id.profile.name
             }
 
-            if (id.profile.name == getUsername(uuid)) {
+            if (uuidNameCache.containsValue(getUsername(uuid))) {
                 chat("${id.profile.name} == ${getUsername(uuid)}")
             }
         }
