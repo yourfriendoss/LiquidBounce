@@ -4,28 +4,22 @@ package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import com.google.gson.JsonParser
 import com.mojang.authlib.GameProfile
-import kotlinx.serialization.json.JsonArray
 import net.ccbluex.liquidbounce.event.NotificationEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleMobOwners
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.ccbluex.liquidbounce.utils.entity.ping
-import net.ccbluex.liquidbounce.utils.io.HttpClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import org.apache.commons.io.IOUtils
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import java.io.IOException
-import java.net.URL
-import java.text.ParseException
+import java.util.*
 
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
@@ -43,7 +37,11 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
-                            chat(getUsername(entry.profile.id.toString()).toString())
+                            for (entity in world.entities) {
+                                if (entity is PlayerEntity && entity.entityName == getUsername(entry.profile.id)) {
+                                    chat("${getUsername(entry.profile.id)} == ${entity.entityName}")
+                                }
+                            }
 
                             if (isADuplicate(entry.profile)) {
                                 event.cancelEvent()
@@ -104,7 +102,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         return false
     }
 
-    fun getUsername(uuid: String): String? {
+    fun getUsername(uuid: UUID): String? {
         val client = HttpClients.createDefault()
         val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
         val response = client.execute(request)
