@@ -7,16 +7,14 @@ import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClients
+import java.util.*
 
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
-
-    val delay by int("delay", 0, 0..5000)
-
-    val timer = Chronometer()
 
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
@@ -25,12 +23,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (timer.hasElapsed(delay.toLong())) {
-                    if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && isArmored(entry))) {
-                        event.cancelEvent()
-                        notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
-                    }
-                    timer.reset()
+                if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(entry.profile.id))) {
+                    event.cancelEvent()
+                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                 }
             }
         }
@@ -40,10 +35,12 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         return network.playerList.count { it.profile.name == entry.profile.name } > 0
     }
 
-    private fun isArmored(entry: PlayerListS2CPacket.Entry): Boolean {
-        for (i in 0..3) {
-            return !world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(i).isEmpty
-        }
-        return false
+
+    fun doesSiteAcceptName(uuid: UUID): Boolean {
+        val client = HttpClients.createDefault()
+        val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
+        val response = client.execute(request)
+
+        return response.statusLine.statusCode == 200
     }
 }
