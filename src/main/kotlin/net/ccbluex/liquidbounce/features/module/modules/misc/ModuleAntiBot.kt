@@ -22,7 +22,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(entry.profile))) {
+                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(
+                        entry.profile
+                    ))
+                ) {
                     event.cancelEvent()
                     notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                 }
