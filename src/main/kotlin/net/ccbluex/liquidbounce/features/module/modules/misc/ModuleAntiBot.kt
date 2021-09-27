@@ -10,6 +10,7 @@ import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
+import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
@@ -24,7 +25,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                 when (packet.action) {
                     PlayerListS2CPacket.Action.ADD_PLAYER -> {
                         for (entry in packet.entries) {
-                            if (entry.profile.name.length < 3 || entry.latency < 2 || entry.profile.id == player.uuid && entry.profile.name == player.entityName) {
+                            if (entry.profile.name.length < 3 || entry.latency < 2) {
                                 continue
                             }
 
@@ -62,7 +63,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity)) {
+                if (!isArmored(entity) || entity.ping < 2) {
                     pName = null
                 }
 
