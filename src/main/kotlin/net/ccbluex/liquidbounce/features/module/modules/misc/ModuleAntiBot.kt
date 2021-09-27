@@ -23,15 +23,11 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                if (entry.profile.name.length < 3) {
+                if (entry.profile.name.length < 3 || entry.latency < 2 || entry.profile.id == player.uuid && entry.profile.name == player.entityName) {
                     continue
                 }
 
-                if (entry.profile.id == player.uuid && entry.profile.name == player.entityName) {
-                    continue
-                }
-
-                if (!isADuplicate(entry.profile) || ((!entry.profile.properties.isEmpty || entry.latency < 2) && doesSiteAcceptName(entry.profile))) {
+                if (!isADuplicate(entry.profile) || (!entry.profile.properties.isEmpty && doesSiteAcceptName(entry.profile))) {
                     continue
                 }
 
