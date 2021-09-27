@@ -2,6 +2,7 @@
 
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
+import com.mojang.authlib.GameProfile
 import net.ccbluex.liquidbounce.event.NotificationEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
@@ -11,8 +12,6 @@ import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
-import java.util.*
-
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
@@ -23,7 +22,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(entry.profile.id))) {
+                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(entry.profile))) {
                     event.cancelEvent()
                     notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                 }
@@ -31,14 +30,14 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    private fun isADuplicate(entry: PlayerListS2CPacket.Entry): Boolean {
-        return network.playerList.count { it.profile.name == entry.profile.name } > 0
+    private fun isADuplicate(profile: GameProfile): Boolean {
+        return network.playerList.count { it.profile.name == profile.name } > 0
     }
 
 
-    fun doesSiteAcceptName(uuid: UUID): Boolean {
+    private fun doesSiteAcceptName(profile: GameProfile): Boolean {
         val client = HttpClients.createDefault()
-        val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
+        val request = HttpGet("https://api.mojang.com/user/profiles/${profile.id}/names")
         val response = client.execute(request)
 
         return response.statusLine.statusCode == 200
