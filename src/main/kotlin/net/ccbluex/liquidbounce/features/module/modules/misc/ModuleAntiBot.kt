@@ -26,15 +26,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
 
+    private var canCancelEvent = false
+
     private val uuidNameCache = hashMapOf<UUID, String>()
-
-    override fun disable() {
-        uuidNameCache.clear()
-    }
-
-    override fun enable() {
-        uuidNameCache.clear()
-    }
 
     val packetHandler = handler<PacketEvent> { event ->
 
@@ -47,14 +41,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
-                            /*startChecking(entry.profile.id)
-                             for (entity in world.entities) {
-                                 if (entity is PlayerEntity && entity.entityName == getUsername(entry.profile.id)) {
-                                     chat("${getUsername(entry.profile.id)} == ${entity.entityName}")
-                                 }
-                             }
+                            startChecking(entry.profile.id)
 
-                             if (isADuplicate(entry.profile)) {
+                             if (canCancelEvent) {
                                  event.cancelEvent()
                                  notification(
                                      "AntiBot",
@@ -64,7 +53,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                  continue
                              }
 
-                             pName = entry.profile.name*/
+                             pName = entry.profile.name
                         }
                     }
                     PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
@@ -128,17 +117,28 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
 
-    /*fun startChecking(uuid: UUID) {
+    fun startChecking(uuid: UUID) {
         uuidNameCache.clear()
 
-        uuidNameCache[uuid] = getUsername(uuid)!!
+        network.playerUuids.add(uuid)
 
         for (id in network.playerUuids) {
             if (id != uuid) {
                 uuidNameCache[id] = getUsername(id)!!
             }
         }
+        chat (uuidNameCache.toString())
 
-        if (uuidNameCache.)
-    }*/
+        if (uuidNameCache.contains(uuid) && uuidNameCache.containsValue(getUsername(uuid))) {
+            chat("$uuid of ${getUsername(uuid)}")
+            for (entity in world.entities) {
+                if (entity is PlayerEntity && entity.entityName == getUsername(uuid)) {
+                    chat("yes??????")
+                    if (isArmored(entity)) {
+                        chat("te")
+                    }
+                }
+            }
+        }
+    }
 }
