@@ -27,13 +27,16 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && entry.latency > 1 && !doesSiteAcceptName(
-                        entry.profile
-                    ))
-                ) {
-                    event.cancelEvent()
-                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                if (entry.profile.id == player.uuid && entry.profile.name == player.entityName) {
+                    continue
                 }
+
+                if (!isADuplicate(entry.profile) || (!entry.profile.properties.isEmpty && entry.latency < 2 && doesSiteAcceptName(entry.profile))) {
+                    continue
+                }
+
+                event.cancelEvent()
+                notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
             }
         }
     }
