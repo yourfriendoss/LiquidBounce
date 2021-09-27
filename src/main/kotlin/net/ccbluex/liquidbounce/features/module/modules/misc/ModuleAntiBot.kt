@@ -26,6 +26,12 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
+                            if (world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(1).isEmpty) {
+                                chat("empty lol")
+                            } else {
+                                chat("noetmepy")
+                            }
+
                             if (isADuplicate(entry.profile)) {
                                 event.cancelEvent()
                                 notification(
@@ -34,19 +40,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                     NotificationEvent.Severity.INFO
                                 )
                                 chat("duplicate, whatn andiot")
-                            } else {
-                                chat("oh u entered")
-                                for (i in 0..3) {
-                                    if (!world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(i).isEmpty && entry.latency > 1) {
-                                        chat("u also entered this, cool cool")
-                                        event.cancelEvent()
-                                        notification(
-                                            "AntiBot",
-                                            "Removed ${entry.profile.name}",
-                                            NotificationEvent.Severity.INFO
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
