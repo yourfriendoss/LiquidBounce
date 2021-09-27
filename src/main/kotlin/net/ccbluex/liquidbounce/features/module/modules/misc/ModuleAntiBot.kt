@@ -16,6 +16,11 @@ import org.apache.http.impl.client.HttpClients
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     val packetHandler = handler<PacketEvent> { event ->
+
+        if (mc.world == null || mc.player == null) {
+            return@handler
+        }
+
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
                 if (entry.profile.name.length < 3) {
