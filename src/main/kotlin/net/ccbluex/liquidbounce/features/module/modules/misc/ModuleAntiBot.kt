@@ -28,7 +28,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                             if (isADuplicate(entry.profile.name)) {
                                 canCancelEvent = true
-                                continue
                             }
 
                             for (i in 0..3) {
