@@ -30,6 +30,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                         event.cancelEvent()
                         notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                     }
+                    timer.reset()
                 }
             }
         }
