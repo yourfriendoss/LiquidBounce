@@ -26,10 +26,12 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
+                            if (!world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(1).isEmpty) {
+                                chat("not empty lol")
+                            }
+
                             if (world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(1).isEmpty) {
-                                chat("empty lol")
-                            } else {
-                                chat("noetmepy")
+                                chat("met[pyepy")
                             }
 
                             if (isADuplicate(entry.profile)) {
