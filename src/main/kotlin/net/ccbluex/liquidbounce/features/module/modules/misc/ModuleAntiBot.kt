@@ -10,6 +10,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.notification
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 
 
@@ -26,7 +27,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                                 continue
                             }
 
-                            if (!world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(1).isEmpty) {
+                            if (!(entry.profile as PlayerEntity).inventory.getArmorStack(1).isEmpty) {
                                 chat("not empty lol")
                             }
 
