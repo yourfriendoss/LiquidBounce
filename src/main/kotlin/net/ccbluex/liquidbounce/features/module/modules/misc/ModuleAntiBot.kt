@@ -27,12 +27,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (!isADuplicate(entry.profile) || (!entry.profile.properties.isEmpty && doesSiteAcceptName(entry.profile))) {
-                    continue
+                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && !doesSiteAcceptName(entry.profile))) {
+                    event.cancelEvent()
+                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                 }
-
-                event.cancelEvent()
-                notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
             }
         }
     }
