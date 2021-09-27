@@ -2,7 +2,6 @@
 
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
-import com.mojang.authlib.GameProfile
 import net.ccbluex.liquidbounce.event.NotificationEvent
 import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
@@ -21,7 +20,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (isADuplicate(entry.profile) || (entry.profile.properties.isEmpty && entry.latency > 1)) {
+                network.playerUuids.add(entry.profile.id)
+
+                if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && isArmored(entry))) {
                     event.cancelEvent()
                     notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                 }
@@ -29,8 +30,14 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
     }
 
-    private fun isADuplicate(profile: GameProfile): Boolean {
-        return network.playerList.count { it.profile.name == profile.name } > 0
+    private fun isADuplicate(entry: PlayerListS2CPacket.Entry): Boolean {
+        return network.playerList.count { it.profile.name == entry.profile.name } > 0
     }
 
+    private fun isArmored(entry: PlayerListS2CPacket.Entry): Boolean {
+        for (i in 0..3) {
+            return !world.getPlayerByUuid(entry.profile.id)!!.inventory.getArmorStack(i).isEmpty
+        }
+        return false
+    }
 }
