@@ -31,7 +31,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                if (!isADuplicate(entry.profile) || (!entry.profile.properties.isEmpty && entry.latency < 2 && doesSiteAcceptName(entry.profile))) {
+                if (!isADuplicate(entry.profile) || ((!entry.profile.properties.isEmpty || entry.latency < 2) && doesSiteAcceptName(entry.profile))) {
                     continue
                 }
 
