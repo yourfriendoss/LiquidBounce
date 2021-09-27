@@ -7,11 +7,16 @@ import net.ccbluex.liquidbounce.event.PacketEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
+
+    val delay by int("delay", 0, 0..5000)
+
+    val timer = Chronometer()
 
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
@@ -20,11 +25,11 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                     continue
                 }
 
-                network.playerUuids.add(entry.profile.id)
-
-                if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && isArmored(entry))) {
-                    event.cancelEvent()
-                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                if (timer.hasElapsed(delay.toLong())) {
+                    if (isADuplicate(entry) || (entry.profile.properties.isEmpty && entry.latency > 1 && isArmored(entry))) {
+                        event.cancelEvent()
+                        notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                    }
                 }
             }
         }
