@@ -225,14 +225,14 @@
   "liquidbounce.module.godMode.description": "Allows you to be invulnerable.",
 
   "liquidbounce.module.kick.description": "Kicks yourself from the server.",
-  "liquidbounce.module.kick.messages.cantEnableInSingleplayer": "Cannot enable %s in singleplayer.",
+  "liquidbounce.module.kick.cantEnableInSingleplayer": "Cannot enable %s in singleplayer.",
 
   "liquidbounce.module.moreCarry.description": "Allows you to store additional items in your crafting slots (only works in multiplayer).",
 
   "liquidbounce.module.noPitchLimit.description": "Allows you to rotate your head beyond the regular pitch limit.",
 
   "liquidbounce.module.pingSpoof.description": "Spoofs your ping to a specified value.",
-  "liquidbounce.module.pingSpoof.messages.noSingleplayer": "Cannot enable %s in singleplayer.",
+  "liquidbounce.module.pingSpoof.noSingleplayer": "Cannot enable %s in singleplayer.",
 
   "liquidbounce.module.plugins.description": "Allows you to see a server's plugins.",
   "liquidbounce.module.plugins.messages.timeOut": "Plugins check timed out.",

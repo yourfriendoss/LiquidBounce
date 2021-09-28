@@ -73,7 +73,7 @@ object CommandExecutor : Listenable {
                 }
             } catch (e: Exception) {
                 chat(
-                    TranslatableText("liquidbounce.commandManager.exceptionOccurred", e).styled {
+                    TranslatableText("liquidbounce.commandManager.exceptionOccurred", e).styled { it ->
                         it.withColor(
                             Formatting.RED
                         )
