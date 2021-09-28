@@ -10,50 +10,28 @@ import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.notification
-import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
-        when (val packet = event.packet) {
-            is PlayerListS2CPacket -> {
-                when (packet.action) {
-                    PlayerListS2CPacket.Action.ADD_PLAYER -> {
-                        for (entry in packet.entries) {
-                            if (entry.profile.name.length < 3 || entry.latency < 2) {
-                                continue
-                            }
-
-                            if (isADuplicate(entry.profile)) {
-                                event.cancelEvent()
-                                notification(
-                                    "AntiBot",
-                                    "Removed ${entry.profile.name}",
-                                    NotificationEvent.Severity.INFO
-                                )
-                                continue
-                            }
-
-                            pName = entry.profile.name
-                        }
-                    }
-                    PlayerListS2CPacket.Action.REMOVE_PLAYER -> {
-                        for (entry in packet.entries) {
-                            if (entry.profile.name == pName) {
-                                pName = null
-                            }
-                        }
-                    }
-                    else -> {
-                    }
+        if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
+            for (entry in event.packet.entries) {
+                if (entry.profile.name.length < 3 || entry.latency < 2) {
+                    continue
                 }
+
+                if (isADuplicate(entry.profile)) {
+                    event.cancelEvent()
+                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                    continue
+                }
+
+                pName = entry.profile.name
             }
         }
     }
@@ -65,16 +43,14 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity) || entity.ping < 2) {
+                if (!isArmored(entity)) {
                     pName = null
+                    break
                 }
 
-                if (pName != null) {
-                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
-                    pName = null
-                }
-                break
+                world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                pName = null
             }
         }
     }
@@ -88,13 +64,5 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             return !entity.inventory.getArmorStack(i).isEmpty
         }
         return false
-    }
-
-    private fun doesSiteAcceptProfile(profile: GameProfile): Boolean {
-        val client = HttpClients.createDefault()
-        val request = HttpGet("https://api.mojang.com/user/profiles/${profile.id}/names")
-        val response = client.execute(request)
-
-        return response.statusLine.statusCode == 200
     }
 }
