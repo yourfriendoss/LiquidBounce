@@ -22,6 +22,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     private var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
+        if (mc.world == null || mc.player == null) {
+            return@handler
+        }
+
         when (val packet = event.packet) {
             is PlayerListS2CPacket -> {
                 when (packet.action) {
