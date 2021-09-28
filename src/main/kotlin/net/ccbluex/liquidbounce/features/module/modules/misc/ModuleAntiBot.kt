@@ -22,16 +22,12 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     private var pName: String? = null
 
     val packetHandler = handler<PacketEvent> { event ->
-        if (mc.world == null || mc.player == null) {
-            return@handler
-        }
-
         when (val packet = event.packet) {
             is PlayerListS2CPacket -> {
                 when (packet.action) {
                     PlayerListS2CPacket.Action.ADD_PLAYER -> {
                         for (entry in packet.entries) {
-                            if (entry.profile.name.length < 3 || entry.latency < 2 || doesSiteAcceptProfile(entry.profile)) {
+                            if (entry.profile.name.length < 3 || entry.latency < 2) {
                                 continue
                             }
 
