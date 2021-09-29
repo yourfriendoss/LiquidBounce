@@ -15,7 +15,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
-import java.util.*
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
