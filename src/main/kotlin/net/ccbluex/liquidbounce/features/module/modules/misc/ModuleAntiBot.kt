@@ -43,7 +43,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity)) {
+                if (!isArmored(entity) && entity.gameProfile.properties.isEmpty) {
                     pName = null
                     break
                 }
