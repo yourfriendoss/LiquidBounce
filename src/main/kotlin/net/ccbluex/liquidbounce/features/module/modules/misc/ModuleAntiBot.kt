@@ -24,7 +24,15 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                if (entry.profile.name.length < 3 || entry.latency < 2 && !entry.profile.properties.isEmpty) {
+                if (entry.latency < 2) {
+                    continue
+                }
+
+                if (entry.profile.name.length < 3) {
+                    continue
+                }
+
+                if (!entry.profile.properties.isEmpty) {
                     continue
                 }
 
@@ -46,7 +54,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity) && doesSiteAcceptPlayer(entity.uuid)) {
+                if (!isArmored(entity)) {
                     pName = null
                 }
 
@@ -68,13 +76,5 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             return !entity.inventory.getArmorStack(i).isEmpty
         }
         return false
-    }
-
-    private fun doesSiteAcceptPlayer(uuid: UUID): Boolean {
-        val client = HttpClients.createDefault()
-        val request = HttpGet("https://api.mojang.com/user/profiles/${uuid}/names")
-        val response = client.execute(request)
-
-        return response.statusLine.statusCode == 200
     }
 }
