@@ -13,9 +13,6 @@ import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
-import java.util.*
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
@@ -24,15 +21,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                if (entry.latency < 2) {
-                    continue
-                }
-
-                if (entry.profile.name.length < 3) {
-                    continue
-                }
-
-                if (!entry.profile.properties.isEmpty) {
+                if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty) {
                     continue
                 }
 
