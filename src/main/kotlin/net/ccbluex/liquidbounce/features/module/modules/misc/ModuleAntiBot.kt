@@ -56,13 +56,12 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             if (entity is PlayerEntity && entity.entityName == pName) {
                 if (!isArmored(entity)) {
                     pName = null
+                    continue
                 }
 
-                if (pName != null) {
-                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
-                    pName = null
-                }
+                world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                pName = null
             }
         }
     }
