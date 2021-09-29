@@ -15,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
+import java.util.*
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
@@ -45,9 +46,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity) && doesSiteAcceptPlayer(entity)) {
+                if (!isArmored(entity) && doesSiteAcceptPlayer(entity.uuidAsString)) {
                     pName = null
-                    break
+                    continue
                 }
 
                 world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
@@ -68,9 +69,9 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         return false
     }
 
-    private fun doesSiteAcceptPlayer(entity: PlayerEntity): Boolean {
+    private fun doesSiteAcceptPlayer(uuid: String): Boolean {
         val client = HttpClients.createDefault()
-        val request = HttpGet("https://api.mojang.com/user/profiles/${entity.uuid}/names")
+        val request = HttpGet("https://api.mojang.com/user/profiles/$uuid/names")
         val response = client.execute(request)
 
         return response.statusLine.statusCode == 200
