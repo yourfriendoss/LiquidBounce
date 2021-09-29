@@ -13,6 +13,8 @@ import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClients
 
 object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
@@ -43,7 +45,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                if (!isArmored(entity) && entity.gameProfile.properties.isEmpty) {
+                if (!isArmored(entity) && doesSiteAcceptPlayer(entity)) {
                     pName = null
                     break
                 }
@@ -64,5 +66,13 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             return !entity.inventory.getArmorStack(i).isEmpty
         }
         return false
+    }
+
+    private fun doesSiteAcceptPlayer(entity: PlayerEntity): Boolean {
+        val client = HttpClients.createDefault()
+        val request = HttpGet("https://api.mojang.com/user/profiles/${entity.uuid}/names")
+        val response = client.execute(request)
+
+        return response.statusLine.statusCode == 200
     }
 }
