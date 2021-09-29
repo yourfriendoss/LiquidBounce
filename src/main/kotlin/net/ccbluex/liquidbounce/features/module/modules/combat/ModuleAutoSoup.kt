@@ -26,7 +26,6 @@ import net.ccbluex.liquidbounce.utils.item.convertClientSlotToServerSlot
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.ccbluex.liquidbounce.utils.item.findInventorySlot
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
-import net.minecraft.item.Item
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
@@ -83,24 +82,14 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
                     utilizeInventory(bowlHotbarSlot, 1, SlotActionType.THROW, false)
                 }
                 BowlMode.MOVE -> {
-                    val openInventory = mc.currentScreen !is InventoryScreen
-
-                    if (openInventory) {
-                        network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY))
-                    }
-
                     // If there is neither an empty slot nor an empty bowl, then replace whatever there is on slot 9
                     if (!player.inventory.getStack(9).isEmpty || player.inventory.getStack(9).item != Items.BOWL) {
-                        utilizeInventory(bowlHotbarSlot, 0, SlotActionType.PICKUP, true)
-                        utilizeInventory(9, 0, SlotActionType.PICKUP, true)
+                        utilizeInventory(bowlHotbarSlot, 0, SlotActionType.PICKUP, false)
+                        utilizeInventory(9, 0, SlotActionType.PICKUP, false)
                         utilizeInventory(bowlHotbarSlot, 0, SlotActionType.PICKUP, true)
                     } else {
                         // If there is, simply shift + click the empty bowl from hotbar
                         utilizeInventory(bowlHotbarSlot, 0, SlotActionType.QUICK_MOVE, true)
-                    }
-
-                    if (openInventory) {
-                        network.sendPacket(CloseHandledScreenC2SPacket(0))
                     }
                 }
             }
@@ -121,26 +110,24 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
             } else {
                 // Search for the specific item in inventory and quick move it to hotbar
                 if (bowlInvSlot != null) {
-                    utilizeInventory(bowlInvSlot, 0, SlotActionType.QUICK_MOVE, false)
+                    utilizeInventory(bowlInvSlot, 0, SlotActionType.QUICK_MOVE, true)
                 }
                 return@repeatable
             }
         }
     }
 
-    private fun utilizeInventory(slot: Int, button: Int, slotActionType: SlotActionType, onlyActions: Boolean) {
+    private fun utilizeInventory(slot: Int, button: Int, slotActionType: SlotActionType, close: Boolean) {
         val serverSlot = convertClientSlotToServerSlot(slot)
         val openInventory = mc.currentScreen !is InventoryScreen
 
-        if (!onlyActions) {
-            if (openInventory) {
-                network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY))
-            }
+        if (openInventory) {
+            network.sendPacket(ClientCommandC2SPacket(player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY))
         }
 
         interaction.clickSlot(0, serverSlot, button, slotActionType, player)
 
-        if (!onlyActions) {
+        if (close) {
             if (openInventory) {
                 network.sendPacket(CloseHandledScreenC2SPacket(0))
             }
