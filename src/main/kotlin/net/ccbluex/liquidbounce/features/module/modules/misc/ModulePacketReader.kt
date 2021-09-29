@@ -14,4 +14,8 @@ object ModulePacketReader : Module("PacketReader", Category.MISC) {
             chat(event.packet.toString())
         }
     }
+
+    override fun enable() {
+        chat("${player.uuid} + ${player.uuidAsString}")
+    }
 }
