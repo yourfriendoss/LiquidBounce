@@ -65,4 +65,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
         return false
     }
+
+    // TODO: Check if player removal on Practice is caused by dupe
 }
