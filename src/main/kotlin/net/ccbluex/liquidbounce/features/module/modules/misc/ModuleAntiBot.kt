@@ -67,7 +67,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     private fun isTheSamePlayer(profile: GameProfile): Boolean {
-        // Prevents false positives when a player joins a Mini game
+        // Prevents false positives when a player joins a minigame such as Practice
         return network.playerList.count { it.profile.name == profile.name && it.profile.id == profile.id } > 0
     }
 
