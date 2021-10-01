@@ -21,11 +21,11 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty || isTheSamePlayer(entry.profile)) {
+                if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty) {
                     continue
                 }
 
-                if (isADuplicate(entry.profile)) {
+                if (isADuplicate(entry.profile) && !isTheSamePlayer(entry.profile)) {
                     event.cancelEvent()
                     notification("AntiBot", "Removed dupe ${entry.profile.name}", NotificationEvent.Severity.INFO)
                     continue
@@ -68,8 +68,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
     private fun isTheSamePlayer(profile: GameProfile): Boolean {
         // Prevents false positives when a player joins a Mini game
-        network.playerList.forEach { return it.profile.name == profile.name && it.profile.id == profile.id }
-        return false
+        return network.playerList.count { it.profile.name == profile.name && it.profile.id == profile.id } > 0
     }
 
     // TODO: Check if player removal on Practice is caused by dupe
