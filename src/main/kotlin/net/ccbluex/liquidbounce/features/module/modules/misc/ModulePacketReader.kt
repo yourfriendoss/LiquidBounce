@@ -10,7 +10,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 object ModulePacketReader : Module("PacketReader", Category.MISC) {
 
     val p = handler<PacketEvent> { event ->
-        if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
+        if (event.packet is PlayerListS2CPacket) {
             chat(event.packet.toString())
         }
     }
