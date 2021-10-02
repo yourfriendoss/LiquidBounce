@@ -27,7 +27,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (isADuplicate(entry.profile)) {
                     event.cancelEvent()
-                    notification("AntiBot", "Removed dupe ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
                     continue
                 }
 
@@ -70,6 +70,4 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         // Prevents false positives when a player joins a minigame such as Practice
         return network.playerList.count { it.profile.name == profile.name && it.profile.id == profile.id } > 0
     }
-
-    // TODO: Check if player removal on Practice is caused by dupe
 }
