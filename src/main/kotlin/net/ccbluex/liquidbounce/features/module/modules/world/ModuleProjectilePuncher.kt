@@ -47,13 +47,6 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
 
     private val range by float("Range", 3f, 2f..6f)
     private val swing by boolean("Swing", true)
-    val wallRange by float("WallRange", 3f, 0f..8f).listen {
-        if (it > range) {
-            range
-        } else {
-            it
-        }
-    }
 
     // Target
     private val targetTracker = tree(TargetTracker())
@@ -89,7 +82,7 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                     player.eyesPos,
                     entity.boundingBox,
                     range = range.toDouble(),
-                    wallsRange = wallRange.toDouble()
+                    wallsRange = 0.0
                 ) ?: continue
 
                 // lock on target tracker
