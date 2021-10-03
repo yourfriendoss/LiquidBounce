@@ -45,8 +45,8 @@ import net.minecraft.util.Hand
 
 object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
 
-    private val range by float("Range", 3f, 2f..6f)
     private val swing by boolean("Swing", true)
+    private val range by float("Range", 3f, 3f..6f)
 
     // Target
     private val targetTracker = tree(TargetTracker())
