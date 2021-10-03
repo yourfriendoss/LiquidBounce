@@ -45,7 +45,15 @@ import net.minecraft.util.Hand
 
 object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
 
+    private val range by float("Range", 3f, 2f..6f)
     private val swing by boolean("Swing", true)
+    val wallRange by float("WallRange", 3f, 0f..8f).listen {
+        if (it > range) {
+            range
+        } else {
+            it
+        }
+    }
 
     // Target
     private val targetTracker = tree(TargetTracker())
@@ -66,7 +74,7 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
             return
         }
 
-        val squaredRange = 6.0 * 6.0
+        val squaredRange = range * range
 
         targetTracker.validateLock { it.squaredBoxedDistanceTo(player) <= squaredRange }
 
@@ -80,8 +88,8 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                 val (rotation, _) = RotationManager.raytraceBox(
                     player.eyesPos,
                     entity.boundingBox,
-                    range = squaredRange,
-                    wallsRange = 0.0
+                    range = range.toDouble(),
+                    wallsRange = wallRange.toDouble()
                 ) ?: continue
 
                 // lock on target tracker
