@@ -28,9 +28,11 @@ import net.ccbluex.liquidbounce.utils.item.findInventorySlot
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.client.util.InputUtil
 import net.minecraft.item.Items
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
+import net.minecraft.network.packet.c2s.play.*
 import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.util.Hand
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 
 /**
  * AutoGapple module
@@ -60,11 +62,11 @@ object ModuleAutoGapple : Module("AutoGapple", Category.COMBAT) {
 
         // If both have been checked but neither of these provide any result
         if (slot == null && invSlot == null) {
-            if (eating) {
+            /*if (eating) {
                 player.inventory.selectedSlot = prevSlot
-            } else {
+            } else {*/
                 return@repeatable
-            }
+            //}
         }
 
         if (player.isDead) {
@@ -73,16 +75,19 @@ object ModuleAutoGapple : Module("AutoGapple", Category.COMBAT) {
 
         if (player.health < health) {
             if (slot != null) {
-                if (!saveSlot) {
+               /* if (!saveSlot) {
                     prevSlot = player.inventory.selectedSlot
                     saveSlot = true
                 }
 
-                player.inventory.selectedSlot = slot
+                player.inventory.selectedSlot = slot*/
+                if(slot != player.inventory.selectedSlot) {
+                    network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
+                }
 
                 wait(2)
                 eating = true
-                mc.options.keyUse.isPressed = true
+                network.sendPacket(PlayerInteractItemC2SPacket(Hand.MAIN_HAND))
             } else {
                 // If there's no apples in the hotbar slot though, start checking on inventory
                 val serverSlot = convertClientSlotToServerSlot(invSlot!!)
@@ -103,10 +108,19 @@ object ModuleAutoGapple : Module("AutoGapple", Category.COMBAT) {
         }
 
         if (eating && player.health + player.absorptionAmount >= health) {
-            saveSlot = false
+            /*saveSlot = false
             eating = false
             mc.options.keyUse.isPressed = false
-            player.inventory.selectedSlot = prevSlot
+            player.inventory.selectedSlot = prevSlot*/
+            network.sendPacket(
+                PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
+                    BlockPos.ORIGIN,
+                    Direction.DOWN
+                )
+            )
+            network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
+            eating = false
         }
     }
 }
