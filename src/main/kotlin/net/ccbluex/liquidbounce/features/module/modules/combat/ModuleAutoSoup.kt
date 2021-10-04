@@ -44,9 +44,6 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
     private val bowl by enumChoice("Bowl", BowlMode.DROP, BowlMode.values())
     private val health by int("Health", 18, 1..20)
 
-    private var lastSlot = -1
-    private var saveSlot = false
-
     val repeatable = repeatable {
         val mushroomStewSlot = findHotbarSlot(Items.MUSHROOM_STEW)
 
@@ -70,10 +67,7 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
                     Direction.DOWN
                 )
             )
-            /*if (saveSlot) {
-                player.inventory.selectedSlot = lastSlot
-                saveSlot = false
-            }*/
+            network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
             when (bowl) {
                 BowlMode.DROP -> {
                     utilizeInventory(bowlHotbarSlot, 1, SlotActionType.THROW, false)
@@ -95,12 +89,9 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
 
         if (player.health < health) {
             if (mushroomStewSlot != null) {
-                /*if (!saveSlot) {
-                    lastSlot = player.inventory.selectedSlot
-                    saveSlot = true
+                if (mushroomStewSlot != player.inventory.selectedSlot) {
+                    network.sendPacket(UpdateSelectedSlotC2SPacket(mushroomStewSlot))
                 }
-                player.inventory.selectedSlot = mushroomStewSlot*/
-                network.sendPacket(UpdateSelectedSlotC2SPacket(mushroomStewSlot))
                 // Using timer so as to avoid sword shield
                 wait(2)
                 network.sendPacket(PlayerInteractItemC2SPacket(Hand.MAIN_HAND))
