@@ -34,7 +34,6 @@ import net.ccbluex.liquidbounce.utils.client.protocolVersion
 import net.ccbluex.liquidbounce.utils.combat.CpsScheduler
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.combat.shouldBeAttacked
-import net.ccbluex.liquidbounce.utils.entity.boxedDistanceTo
 import net.ccbluex.liquidbounce.utils.entity.eyesPos
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.entity.wouldBlockHit
@@ -203,7 +202,7 @@ object ModuleKillAura : Module("KillAura", Category.COMBAT) {
         val target = targetTracker.lockedOnTarget ?: return
         val rotation = RotationManager.serverRotation ?: return
 
-        if (target.boxedDistanceTo(player) <= range && facingEnemy(
+        if (target.squaredBoxedDistanceTo(player) <= range * range && facingEnemy(
                 target,
                 range.toDouble(),
                 rotation
