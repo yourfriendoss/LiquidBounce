@@ -27,10 +27,7 @@ import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.ccbluex.liquidbounce.utils.item.findInventorySlot
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.item.Items
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
+import net.minecraft.network.packet.c2s.play.*
 import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
@@ -73,10 +70,10 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
                     Direction.DOWN
                 )
             )
-            if (saveSlot) {
+            /*if (saveSlot) {
                 player.inventory.selectedSlot = lastSlot
                 saveSlot = false
-            }
+            }*/
             when (bowl) {
                 BowlMode.DROP -> {
                     utilizeInventory(bowlHotbarSlot, 1, SlotActionType.THROW, false)
@@ -98,11 +95,12 @@ object ModuleAutoSoup : Module("AutoSoup", Category.COMBAT) {
 
         if (player.health < health) {
             if (mushroomStewSlot != null) {
-                if (!saveSlot) {
+                /*if (!saveSlot) {
                     lastSlot = player.inventory.selectedSlot
                     saveSlot = true
                 }
-                player.inventory.selectedSlot = mushroomStewSlot
+                player.inventory.selectedSlot = mushroomStewSlot*/
+                network.sendPacket(UpdateSelectedSlotC2SPacket(mushroomStewSlot))
                 // Using timer so as to avoid sword shield
                 wait(2)
                 network.sendPacket(PlayerInteractItemC2SPacket(Hand.MAIN_HAND))
