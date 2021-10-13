@@ -22,6 +22,7 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.AttackEvent
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.repeatable
+import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -77,20 +78,22 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                     continue
                 }
 
-                // find best spot (and skip if no spot was found)
-                val (rotation, _) = RotationManager.raytraceBox(
-                    player.eyesPos,
-                    entity.boundingBox,
-                    range = range.toDouble(),
-                    wallsRange = 0.0
-                ) ?: continue
+                if (!FriendManager.isFriend((entity as FireballEntity).owner!!.entityName)) {
+                    // find best spot (and skip if no spot was found)
+                    val (rotation, _) = RotationManager.raytraceBox(
+                        player.eyesPos,
+                        entity.boundingBox,
+                        range = range.toDouble(),
+                        wallsRange = 0.0
+                    ) ?: continue
 
-                // lock on target tracker
-                targetTracker.lock(entity)
+                    // lock on target tracker
+                    targetTracker.lock(entity)
 
-                // aim at target
-                RotationManager.aimAt(rotation, configurable = rotations)
-                break
+                    // aim at target
+                    RotationManager.aimAt(rotation, configurable = rotations)
+                    break
+                }
             }
         }
 
