@@ -78,8 +78,12 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                 if (entity.squaredBoxedDistanceTo(player) > squaredRange) {
                     continue
                 }
-                chat("${(entity as FireballEntity).owner!!.entityName}, ${entity.ownerUuid}, ${entity.owner!!.uuid}")
 
+                runCatching {
+                    chat("${(entity as FireballEntity).owner!!.entityName} a ${entity.ownerUuid}, ${entity.owner!!.uuid}")
+                }.onFailure {
+                    chat("NULL lol",)
+                }
                 if (!FriendManager.isFriend((entity as FireballEntity).owner!!.entityName)) {
                     // find best spot (and skip if no spot was found)
                     val (rotation, _) = RotationManager.raytraceBox(
