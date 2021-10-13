@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.client.MC_1_8
+import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.protocolVersion
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.entity.eyesPos
@@ -77,6 +78,7 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                 if (entity.squaredBoxedDistanceTo(player) > squaredRange) {
                     continue
                 }
+                chat("${(entity as FireballEntity).owner!!.entityName}, ${entity.ownerUuid}, ${entity.owner!!.uuid}")
 
                 if (!FriendManager.isFriend((entity as FireballEntity).owner!!.entityName)) {
                     // find best spot (and skip if no spot was found)
