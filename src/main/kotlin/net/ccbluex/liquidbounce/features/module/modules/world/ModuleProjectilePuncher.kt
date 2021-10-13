@@ -22,13 +22,11 @@ package net.ccbluex.liquidbounce.features.module.modules.world
 import net.ccbluex.liquidbounce.event.AttackEvent
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.repeatable
-import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.client.MC_1_8
-import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.protocolVersion
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.entity.eyesPos
@@ -79,27 +77,20 @@ object ModuleProjectilePuncher : Module("ProjectilePuncher", Category.WORLD) {
                     continue
                 }
 
-                runCatching {
-                    chat("${(entity as FireballEntity).owner!!.entityName} a ${entity.ownerUuid}, ${entity.owner!!.uuid}")
-                }.onFailure {
-                    chat("NULL lol",)
-                }
-                if (!FriendManager.isFriend((entity as FireballEntity).owner!!.entityName)) {
-                    // find best spot (and skip if no spot was found)
-                    val (rotation, _) = RotationManager.raytraceBox(
-                        player.eyesPos,
-                        entity.boundingBox,
-                        range = range.toDouble(),
-                        wallsRange = 0.0
-                    ) ?: continue
+                // find best spot (and skip if no spot was found)
+                val (rotation, _) = RotationManager.raytraceBox(
+                    player.eyesPos,
+                    entity.boundingBox,
+                    range = range.toDouble(),
+                    wallsRange = 0.0
+                ) ?: continue
 
-                    // lock on target tracker
-                    targetTracker.lock(entity)
+                // lock on target tracker
+                targetTracker.lock(entity)
 
-                    // aim at target
-                    RotationManager.aimAt(rotation, configurable = rotations)
-                    break
-                }
+                // aim at target
+                RotationManager.aimAt(rotation, configurable = rotations)
+                break
             }
         }
 
