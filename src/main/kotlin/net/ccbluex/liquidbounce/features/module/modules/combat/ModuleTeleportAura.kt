@@ -65,9 +65,6 @@ object ModuleTeleportAura : Module("TeleportAura", Category.COMBAT) {
                 )
             }
 
-            if (player.isOnGround) {
-                player.jump()
-            }
             mc.timer.timerSpeed = timer
             resetTimer = true
             attack(enemy)
