@@ -51,30 +51,32 @@ object ModuleTeleportAura : Module("TeleportAura", Category.COMBAT) {
         val killAuraRange = ((ModuleKillAura.range + scanExtraRange) * (ModuleKillAura.range + scanExtraRange))
 
         for (enemy in targetTracker.enemies()) {
-            if (enemy.squaredBoxedDistanceTo(player) > killAuraRange && enemy.squaredBoxedDistanceTo(player) <= rangeSquared) {
-                targetTracker.lock(enemy)
-                val (rotation, _) = RotationManager.raytraceBox(
-                    player.eyesPos,
-                    enemy.boundingBox,
-                    range = range.toDouble(),
-                    wallsRange = 0.0
-                ) ?: continue
+            if (targetTracker.lockedOnTarget == null) {
+                if (enemy.squaredBoxedDistanceTo(player) > killAuraRange && enemy.squaredBoxedDistanceTo(player) <= rangeSquared) {
+                    targetTracker.lock(enemy)
+                    val (rotation, _) = RotationManager.raytraceBox(
+                        player.eyesPos,
+                        enemy.boundingBox,
+                        range = range.toDouble(),
+                        wallsRange = 0.0
+                    ) ?: continue
 
-                val vec = Rotation(player.yaw, 0f).rotationVec
-                val x = player.x + vec.x * player.distanceTo(enemy) - 1f
-                val y = enemy.y + 0.25
-                val z = player.z + vec.z * player.distanceTo(enemy) - 1f
-                findPath(x, y + 1.0, z, steps.toDouble()).forEach { pos ->
-                    network.sendPacket(
-                        PlayerMoveC2SPacket.Full(pos.x, pos.y, pos.z, rotation.yaw, rotation.pitch, false)
-                    )
+                    val vec = Rotation(player.yaw, 0f).rotationVec
+                    val x = player.x + vec.x * player.distanceTo(enemy) - 1f
+                    val y = enemy.y + 0.25
+                    val z = player.z + vec.z * player.distanceTo(enemy) - 1f
+                    findPath(x, y + 1.0, z, steps.toDouble()).forEach { pos ->
+                        network.sendPacket(
+                            PlayerMoveC2SPacket.Full(pos.x, pos.y, pos.z, rotation.yaw, rotation.pitch, false)
+                        )
+                    }
+                    if (player.isOnGround) {
+                        player.jump()
+                    }
+                    mc.timer.timerSpeed = timer
+                    resetTimer = true
+                    attack(enemy)
                 }
-                if (player.isOnGround) {
-                    player.jump()
-                }
-                mc.timer.timerSpeed = timer
-                resetTimer = true
-                attack(enemy)
             }
         }
     }
