@@ -172,7 +172,8 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModulePacketReader,
             ModuleKeepAlive,
             ModuleNoFriends,
-            ModuleProjectilePuncher
+            ModuleProjectilePuncher,
+            ModuleTeleportAura
         )
 
         builtin.apply {
