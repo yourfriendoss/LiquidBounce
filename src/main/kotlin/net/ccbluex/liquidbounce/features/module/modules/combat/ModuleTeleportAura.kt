@@ -82,9 +82,9 @@ object ModuleTeleportAura : Module("TeleportHit", Category.COMBAT) {
 
         for (pos in positions) {
 
-            vertexFormat.putVertex { this.position = Vec3(pos); this.color = Color4b.WHITE }
+            vertexFormat.putVertex { this.position = Vec3(pos.x, pos.y, pos.z); this.color = Color4b.WHITE }
             vertexFormat.putVertex {
-                this.position = Vec3(pos); this.color = Color4b.WHITE
+                this.position = Vec3(pos.x, pos.y, pos.z); this.color = Color4b.WHITE
             }
 
             RenderEngine.enqueueForRendering(
@@ -93,7 +93,7 @@ object ModuleTeleportAura : Module("TeleportHit", Category.COMBAT) {
                     vertexFormat,
                     PrimitiveType.LineStrip,
                     ColoredPrimitiveShader,
-                    state = GlRenderState(lineWidth = 2.0f, lineSmooth = true)
+                    state = GlRenderState(lineWidth = 10.0f, lineSmooth = true)
                 )
             )
         }
