@@ -5,6 +5,7 @@ import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.client.MC_1_8
 import net.ccbluex.liquidbounce.utils.client.protocolVersion
@@ -59,9 +60,14 @@ object ModuleTeleportAura : Module("TeleportAura", Category.COMBAT) {
                 wallsRange = range.toDouble()
             ) ?: continue
 
-            findPath(enemy.x, enemy.y + 1.0, enemy.z, steps.toDouble()).forEach { pos ->
+            val vec = Rotation(player.yaw, 0f).rotationVec
+            val x = player.x + vec.x * player.distanceTo(enemy) - 1f
+            val y = enemy.y + 0.25
+            val z = player.z + vec.z * player.distanceTo(enemy) - 1f
+
+            findPath(x, y + 1.0, z, steps.toDouble()).forEach { pos ->
                 network.sendPacket(
-                    PlayerMoveC2SPacket.Full(pos.x, pos.y, pos.z, rotation.yaw, rotation.pitch, false)
+                    PlayerMoveC2SPacket.PositionAndOnGround(pos.x, pos.y, pos.z, false)
                 )
             }
 
