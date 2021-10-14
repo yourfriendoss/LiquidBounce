@@ -3,13 +3,10 @@ package net.ccbluex.liquidbounce.features.module.modules.combat
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.render.engine.Color4b
-import net.ccbluex.liquidbounce.render.engine.RenderEngine
-import net.ccbluex.liquidbounce.render.engine.Vec3
+import net.ccbluex.liquidbounce.render.engine.*
 import net.ccbluex.liquidbounce.render.engine.memory.PositionColorVertexFormat
 import net.ccbluex.liquidbounce.render.engine.memory.putVertex
-import net.ccbluex.liquidbounce.render.utils.drawBoxNew
-import net.ccbluex.liquidbounce.render.utils.drawBoxOutlineNew
+import net.ccbluex.liquidbounce.render.shaders.ColoredPrimitiveShader
 import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.facingEnemy
 import net.ccbluex.liquidbounce.utils.client.MC_1_8
@@ -18,14 +15,11 @@ import net.ccbluex.liquidbounce.utils.client.timer
 import net.ccbluex.liquidbounce.utils.combat.TargetTracker
 import net.ccbluex.liquidbounce.utils.entity.squaredBoxedDistanceTo
 import net.ccbluex.liquidbounce.utils.path.findPath
-import net.ccbluex.liquidbounce.utils.render.espBoxInstancedOutlineRenderTask
-import net.ccbluex.liquidbounce.utils.render.espBoxInstancedRenderTask
 import net.minecraft.entity.Entity
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.util.Hand
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 
 object ModuleTeleportAura : Module("TeleportHit", Category.COMBAT) {
@@ -77,31 +71,32 @@ object ModuleTeleportAura : Module("TeleportHit", Category.COMBAT) {
         }
     }
 
-    val box = drawBoxNew(Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), Color4b.WHITE)
+    val renderHandler = handler<EngineRenderEvent> {
+        val vertexFormat = PositionColorVertexFormat()
 
-    val boxOutline = drawBoxOutlineNew(Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0), Color4b.WHITE)
+        vertexFormat.initBuffer(2)
 
-    val tickHandler = handler<EngineRenderEvent> {
-        val instanceBuffer = PositionColorVertexFormat()
-        val instanceBufferOutline = PositionColorVertexFormat()
-        for (i in positions) {
-
-            instanceBuffer.initBuffer(positions.size)
-            instanceBufferOutline.initBuffer(positions.size)
-
-            instanceBuffer.putVertex { this.position = Vec3(i); this.color = Color4b.WHITE }
-            instanceBufferOutline.putVertex { this.position = Vec3(i); this.color = Color4b.WHITE }
+        if (positions.isEmpty()) {
+            return@handler
         }
 
-        RenderEngine.enqueueForRendering(
-        RenderEngine.CAMERA_VIEW_LAYER,
-        espBoxInstancedRenderTask(instanceBuffer, box.first, box.second)
-        )
-        RenderEngine.enqueueForRendering(
-        RenderEngine.CAMERA_VIEW_LAYER,
-        espBoxInstancedOutlineRenderTask(instanceBufferOutline, boxOutline.first, boxOutline.second)
-        )
+        for (pos in positions) {
 
+            vertexFormat.putVertex { this.position = Vec3(pos); this.color = Color4b.WHITE }
+            vertexFormat.putVertex {
+                this.position = Vec3(pos); this.color = Color4b.WHITE
+            }
+
+            RenderEngine.enqueueForRendering(
+                RenderEngine.CAMERA_VIEW_LAYER,
+                VertexFormatRenderTask(
+                    vertexFormat,
+                    PrimitiveType.LineStrip,
+                    ColoredPrimitiveShader,
+                    state = GlRenderState(lineWidth = 2.0f, lineSmooth = true)
+                )
+            )
+        }
     }
 
     fun attack(entity: Entity) {
