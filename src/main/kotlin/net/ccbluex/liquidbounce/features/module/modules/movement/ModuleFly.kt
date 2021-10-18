@@ -27,16 +27,13 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
-import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.minecraft.block.Blocks
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
-import net.minecraft.network.packet.s2c.play.CooldownUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
