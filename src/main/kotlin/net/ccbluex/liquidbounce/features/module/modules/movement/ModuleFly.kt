@@ -26,9 +26,17 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.entity.strafe
+import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.minecraft.block.Blocks
-import net.minecraft.item.EnderPearlItem
+import net.minecraft.item.Items
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
+import net.minecraft.network.packet.s2c.play.CooldownUpdateS2CPacket
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
+import net.minecraft.sound.SoundEvents
+import net.minecraft.util.Hand
 import net.minecraft.util.shape.VoxelShapes
 
 /**
@@ -113,14 +121,49 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         override val parent: ChoiceConfigurable
             get() = modes
 
-        var threwPearl = false
+        val speed by float("Speed", 1f, 0.5f..3f)
 
-        val useCoolDownHandler = handler<UseCooldownEvent> {
-            if (player.inventory.getStack(player.inventory.selectedSlot).item is EnderPearlItem) {
-                chat("yes!!!")
-                threwPearl = true
-            } else {
-                chat("no!!!")
+        var threwPearl = false
+        var canFly = false
+
+        override fun enable() {
+            threwPearl = false
+            canFly = false
+        }
+
+        val repeatable = repeatable {
+            val slot = findHotbarSlot(Items.ENDER_PEARL)
+
+            if (!threwPearl) {
+                if (slot != null) {
+                    if (slot != player.inventory.selectedSlot) {
+                        network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
+                    }
+
+                    network.sendPacket(PlayerMoveC2SPacket.LookAndOnGround(player.yaw, 90f, player.isOnGround))
+                    wait(2)
+                    network.sendPacket(PlayerInteractItemC2SPacket(Hand.MAIN_HAND))
+
+                    if (slot != player.inventory.selectedSlot) {
+                        network.sendPacket(UpdateSelectedSlotC2SPacket(player.inventory.selectedSlot))
+                    }
+
+                    threwPearl = true
+                }
+            } else if (threwPearl && canFly) {
+                player.strafe(speed = speed.toDouble())
+            }
+        }
+
+        val packetHandler = handler<PacketEvent> { event ->
+            if (event.packet is PlaySoundS2CPacket &&
+                event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW &&
+                event.packet is TeleportConfirmC2SPacket &&
+                event.packet is PlayerMoveC2SPacket.Full &&
+                event.packet is CooldownUpdateS2CPacket && threwPearl
+            ) {
+                chat("hi!!!! yES!")
+                canFly = true
             }
         }
     }
