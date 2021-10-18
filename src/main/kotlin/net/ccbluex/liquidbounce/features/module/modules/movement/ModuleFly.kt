@@ -125,7 +125,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         override val parent: ChoiceConfigurable
             get() = modes
 
-        val speed by float("Speed", 1f, 0.5f..3f)
+        val speed by float("Speed", 1f, 0.5f..2f)
 
         var threwPearl = false
         var canFly = false
