@@ -168,12 +168,8 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW) {
-                chat("yes!!! PART 1")
-                if (event.packet is TeleportConfirmC2SPacket && threwPearl) {
-                    chat("hi!!!! yES!")
-                    canFly = true
-                }
+            if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW && player.hurtTime > 0 && threwPearl) {
+                canFly = true
             }
         }
     }
