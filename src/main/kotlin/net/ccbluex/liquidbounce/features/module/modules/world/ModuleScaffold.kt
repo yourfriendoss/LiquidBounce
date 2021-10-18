@@ -127,7 +127,10 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
         val serverRotation = RotationManager.serverRotation ?: return@repeatable
         val rayTraceResult = raycast(4.5, serverRotation) ?: return@repeatable
 
-        if (rayTraceResult.type != HitResult.Type.BLOCK || rayTraceResult.blockPos != target.blockPos || rayTraceResult.side != target.direction || rayTraceResult.pos.y < target.minY || !isValidTarget(rayTraceResult)) {
+        if (rayTraceResult.type != HitResult.Type.BLOCK || rayTraceResult.blockPos != target.blockPos || rayTraceResult.side != target.direction || rayTraceResult.pos.y < target.minY || !isValidTarget(
+                rayTraceResult
+            )
+        ) {
             return@repeatable
         }
 
@@ -250,16 +253,16 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
 
             val first = if (!blockStateToInvestigate.isAir && blockStateToInvestigate.canReplace(
                     ItemPlacementContext(
-                            player,
-                            Hand.MAIN_HAND,
-                            player.inventory.getStack(SilentHotbar.serversideSlot),
-                            BlockHitResult(
-                                    Vec3d.of(posToInvestigate),
-                                    Direction.UP,
-                                    posToInvestigate,
-                                    false
-                                )
+                        player,
+                        Hand.MAIN_HAND,
+                        player.inventory.getStack(SilentHotbar.serversideSlot),
+                        BlockHitResult(
+                            Vec3d.of(posToInvestigate),
+                            Direction.UP,
+                            posToInvestigate,
+                            false
                         )
+                    )
                 )
             ) {
                 Direction.values().mapNotNull { direction ->
