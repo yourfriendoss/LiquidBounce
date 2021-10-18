@@ -24,8 +24,10 @@ import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.minecraft.block.Blocks
+import net.minecraft.item.EnderPearlItem
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.util.shape.VoxelShapes
 
@@ -36,7 +38,7 @@ import net.minecraft.util.shape.VoxelShapes
  */
 object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
-    private val modes = choices("Mode", Vanilla, arrayOf(Vanilla, Jetpack, Verus))
+    private val modes = choices("Mode", Vanilla, arrayOf(Vanilla, Jetpack, Verus, Enderpearl))
 
     private object Visuals : ToggleableConfigurable(this, "Visuals", true) {
 
@@ -104,6 +106,23 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
     init {
         tree(Visuals)
+    }
+
+    private object Enderpearl : Choice("Enderpearl") {
+
+        override val parent: ChoiceConfigurable
+            get() = modes
+
+        var threwPearl = false
+
+        val useCoolDownHandler = handler<UseCooldownEvent> {
+            if (player.inventory.getStack(player.inventory.selectedSlot).item is EnderPearlItem) {
+                chat("yes!!!")
+                threwPearl = true
+            } else {
+                chat("no!!!")
+            }
+        }
     }
 
 }
