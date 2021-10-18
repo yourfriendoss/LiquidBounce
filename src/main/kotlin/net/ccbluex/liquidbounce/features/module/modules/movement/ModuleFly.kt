@@ -24,6 +24,9 @@ import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.*
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.aiming.Rotation
+import net.ccbluex.liquidbounce.utils.aiming.RotationManager
+import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
@@ -38,6 +41,7 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
 import net.minecraft.util.shape.VoxelShapes
+import org.apache.commons.lang3.RandomUtils
 
 /**
  * Fly module
@@ -126,6 +130,8 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         var threwPearl = false
         var canFly = false
 
+        val rotations = tree(RotationsConfigurable())
+
         override fun enable() {
             threwPearl = false
             canFly = false
@@ -140,7 +146,13 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                         network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
                     }
 
-                    network.sendPacket(PlayerMoveC2SPacket.LookAndOnGround(player.yaw, 90f, player.isOnGround))
+                    if (player.pitch <= 80) {
+                        RotationManager.aimAt(
+                            Rotation(player.yaw, RandomUtils.nextFloat(80f, 90f)),
+                            configurable = rotations
+                        )
+                    }
+
                     wait(2)
                     network.sendPacket(PlayerInteractItemC2SPacket(Hand.MAIN_HAND))
 
@@ -158,9 +170,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         val packetHandler = handler<PacketEvent> { event ->
             if (event.packet is PlaySoundS2CPacket &&
                 event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW &&
-                event.packet is TeleportConfirmC2SPacket &&
-                event.packet is PlayerMoveC2SPacket.Full &&
-                event.packet is CooldownUpdateS2CPacket && threwPearl
+                event.packet is TeleportConfirmC2SPacket && threwPearl
             ) {
                 chat("hi!!!! yES!")
                 canFly = true
