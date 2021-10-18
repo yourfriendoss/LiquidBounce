@@ -138,7 +138,21 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val repeatable = repeatable {
+            if (player.isSpectator || player.isDead || player.abilities.creativeMode) {
+                return@repeatable
+            }
+
             val slot = findHotbarSlot(Items.ENDER_PEARL)
+
+            // Make sure the player is STILL flying
+            if (canFly) {
+                player.strafe(speed = speed.toDouble())
+                player.velocity.y = when {
+                    mc.options.keyJump.isPressed -> speed.toDouble()
+                    mc.options.keySneak.isPressed -> -speed.toDouble()
+                    else -> 0.0
+                }
+            }
 
             if (!threwPearl) {
                 if (slot != null) {
