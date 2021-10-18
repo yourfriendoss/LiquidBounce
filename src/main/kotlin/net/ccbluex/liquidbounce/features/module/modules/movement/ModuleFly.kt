@@ -181,6 +181,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                     mc.options.keySneak.isPressed -> -speed.toDouble()
                     else -> 0.0
                 }
+                threwPearl = false
             }
         }
 
