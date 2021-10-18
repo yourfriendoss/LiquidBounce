@@ -163,14 +163,17 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                     threwPearl = true
                 }
             } else if (threwPearl && canFly && player.hurtTime > 0) {
-                chat("lol!11")
                 player.strafe(speed = speed.toDouble())
+                player.velocity.y = when {
+                    mc.options.keyJump.isPressed -> speed.toDouble()
+                    mc.options.keySneak.isPressed -> -speed.toDouble()
+                    else -> 0.0
+                }
             }
         }
 
         val packetHandler = handler<PacketEvent> { event ->
             if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW && threwPearl) {
-                chat("lol!")
                 canFly = true
             }
         }
