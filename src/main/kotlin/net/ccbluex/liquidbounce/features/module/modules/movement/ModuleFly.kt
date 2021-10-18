@@ -33,6 +33,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.sound.SoundEvents
@@ -173,7 +174,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
                     threwPearl = true
                 }
-            } else if (threwPearl && canFly && player.hurtTime > 0) {
+            } else if (threwPearl && canFly ) {
                 player.strafe(speed = speed.toDouble())
                 player.velocity.y = when {
                     mc.options.keyJump.isPressed -> speed.toDouble()
@@ -184,7 +185,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW && threwPearl) {
+            if ((event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW) || event.packet is TeleportConfirmC2SPacket && threwPearl) {
                 canFly = true
             }
         }
