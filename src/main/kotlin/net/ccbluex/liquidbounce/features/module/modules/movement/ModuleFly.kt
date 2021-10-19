@@ -127,6 +127,11 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         var threwPearl = false
         var canFly = false
 
+        override fun enable() {
+            threwPearl = false
+            canFly = false
+        }
+
         val rotations = tree(RotationsConfigurable())
 
         val repeatable = repeatable {
