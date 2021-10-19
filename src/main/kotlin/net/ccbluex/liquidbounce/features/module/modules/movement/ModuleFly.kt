@@ -31,6 +31,7 @@ import net.ccbluex.liquidbounce.utils.block.isBlockAtPosition
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.minecraft.block.AirBlock
+import net.minecraft.block.Block
 import net.minecraft.block.FluidBlock
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
@@ -188,7 +189,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                 val boundingBox = player.boundingBox
                 val detectionBox = boundingBox.withMinY(boundingBox.minY - y)
 
-                return isBlockAtPosition(detectionBox) { it !is AirBlock }
+                return isBlockAtPosition(detectionBox) { it is Block }
             }
             return false
         }
