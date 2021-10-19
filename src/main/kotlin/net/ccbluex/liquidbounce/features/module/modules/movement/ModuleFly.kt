@@ -141,16 +141,6 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                 return@repeatable
             }
 
-            if (canFly) {
-                player.strafe(speed = speed.toDouble())
-                player.velocity.y = when {
-                    mc.options.keyJump.isPressed -> speed.toDouble()
-                    mc.options.keySneak.isPressed -> -speed.toDouble()
-                    else -> 0.0
-                }
-                return@repeatable
-            }
-
             if (!threwPearl && !canFly) {
                 if (slot != null) {
                     if (slot != player.inventory.selectedSlot) {
@@ -173,19 +163,20 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
                     threwPearl = true
                 }
-            } else {
+            } else if (!threwPearl && canFly) {
                 player.strafe(speed = speed.toDouble())
                 player.velocity.y = when {
                     mc.options.keyJump.isPressed -> speed.toDouble()
                     mc.options.keySneak.isPressed -> -speed.toDouble()
                     else -> 0.0
                 }
-                threwPearl = false
+                return@repeatable
             }
         }
 
         val packetHandler = handler<PacketEvent> { event ->
             if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && player.isOnGround && threwPearl) {
+                threwPearl = false
                 canFly = true
             }
         }
