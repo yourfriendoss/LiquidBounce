@@ -29,11 +29,10 @@ import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.Blocks
+import net.minecraft.block.FluidBlock
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.sound.SoundEvents
@@ -46,6 +45,7 @@ import org.apache.commons.lang3.RandomUtils
  *
  * Allows you to fly.
  */
+
 object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
     private val modes = choices("Mode", Vanilla, arrayOf(Vanilla, Jetpack, Verus, Enderpearl))
@@ -105,7 +105,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
             }
         }
         val shapeHandler = handler<BlockShapeEvent> { event ->
-            if (event.state.block == Blocks.AIR && event.pos.y < player.y) {
+            if (event.state.block !is FluidBlock && event.pos.y < player.y) {
                 event.shape = VoxelShapes.fullCube()
             }
         }
@@ -136,7 +136,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val repeatable = repeatable {
-            if (player.isSpectator || player.isDead || player.abilities.creativeMode) {
+            if (player.isSpectator || player.isDead) {
                 return@repeatable
             }
 
@@ -152,7 +152,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                 }
             }
 
-            if (!threwPearl) {
+            if (!threwPearl && !canFly) {
                 if (slot != null) {
                     if (slot != player.inventory.selectedSlot) {
                         network.sendPacket(UpdateSelectedSlotC2SPacket(slot))
@@ -174,7 +174,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
                     threwPearl = true
                 }
-            } else if (threwPearl && canFly) {
+            } else {
                 player.strafe(speed = speed.toDouble())
                 player.velocity.y = when {
                     mc.options.keyJump.isPressed -> speed.toDouble()
@@ -186,7 +186,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if ((event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW) || event.packet is TeleportConfirmC2SPacket && threwPearl) {
+            if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW && threwPearl) {
                 canFly = true
             }
         }
