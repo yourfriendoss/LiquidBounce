@@ -175,9 +175,11 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && player.isOnGround && threwPearl) {
-                threwPearl = false
-                canFly = true
+            if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && threwPearl) {
+                if (player.isOnGround) {
+                    threwPearl = false
+                    canFly = true
+                }
             }
         }
     }
