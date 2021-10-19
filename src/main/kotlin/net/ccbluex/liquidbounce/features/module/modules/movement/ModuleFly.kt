@@ -186,7 +186,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW && player.isOnGround && threwPearl) {
+            if ((event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW) && player.isOnGround && threwPearl) {
                 canFly = true
             }
         }
