@@ -27,18 +27,17 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
-import net.ccbluex.liquidbounce.utils.block.getBlock
 import net.ccbluex.liquidbounce.utils.block.isBlockAtPosition
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.*
+import net.minecraft.block.AirBlock
+import net.minecraft.block.FluidBlock
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
 import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.shape.VoxelShapes
 import org.apache.commons.lang3.RandomUtils
 
@@ -178,7 +177,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && (player.isOnGround || isBitAboveGround()) && threwPearl) {
+            if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && isBitAboveGround() && threwPearl) {
                 threwPearl = false
                 canFly = true
             }
