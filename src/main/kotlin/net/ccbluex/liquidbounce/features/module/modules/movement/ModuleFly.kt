@@ -28,10 +28,10 @@ import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.block.getBlock
+import net.ccbluex.liquidbounce.utils.block.isBlockAtPosition
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.AirBlock
-import net.minecraft.block.FluidBlock
+import net.minecraft.block.*
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
@@ -185,8 +185,11 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         fun isBitAboveGround(): Boolean {
-            for (y in 0..3) {
-                return BlockPos(player.x, player.y - y, player.z).getBlock() !is AirBlock
+            for (y in 0..5) {
+                val boundingBox = player.boundingBox
+                val detectionBox = boundingBox.withMinY(boundingBox.minY - y)
+
+                return isBlockAtPosition(detectionBox) { it !is AirBlock }
             }
             return false
         }
