@@ -30,7 +30,6 @@ import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
 import net.ccbluex.liquidbounce.utils.block.isBlockAtPosition
 import net.ccbluex.liquidbounce.utils.entity.strafe
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
-import net.minecraft.block.AirBlock
 import net.minecraft.block.Block
 import net.minecraft.block.FluidBlock
 import net.minecraft.item.Items
