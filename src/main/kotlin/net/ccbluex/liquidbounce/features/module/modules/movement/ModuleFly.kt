@@ -33,9 +33,8 @@ import net.minecraft.block.FluidBlock
 import net.minecraft.item.Items
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
+import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
-import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
 import net.minecraft.util.shape.VoxelShapes
 import org.apache.commons.lang3.RandomUtils
@@ -130,19 +129,13 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
 
         val rotations = tree(RotationsConfigurable())
 
-        override fun enable() {
-            threwPearl = false
-            canFly = false
-        }
-
         val repeatable = repeatable {
-            if (player.isSpectator || player.isDead) {
+            val slot = findHotbarSlot(Items.ENDER_PEARL)
+
+            if (player.isDead || player.isSpectator || player.abilities.creativeMode) {
                 return@repeatable
             }
 
-            val slot = findHotbarSlot(Items.ENDER_PEARL)
-
-            // Make sure the player is STILL flying
             if (canFly) {
                 player.strafe(speed = speed.toDouble())
                 player.velocity.y = when {
@@ -150,6 +143,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
                     mc.options.keySneak.isPressed -> -speed.toDouble()
                     else -> 0.0
                 }
+                return@repeatable
             }
 
             if (!threwPearl && !canFly) {
@@ -186,7 +180,7 @@ object ModuleFly : Module("Fly", Category.MOVEMENT) {
         }
 
         val packetHandler = handler<PacketEvent> { event ->
-            if (player.isOnGround && (event.packet is PlaySoundS2CPacket && event.packet.sound == SoundEvents.ENTITY_ENDER_PEARL_THROW) && threwPearl) {
+            if (event.origin == TransferOrigin.SEND && event.packet is TeleportConfirmC2SPacket && player.isOnGround && threwPearl) {
                 canFly = true
             }
         }
