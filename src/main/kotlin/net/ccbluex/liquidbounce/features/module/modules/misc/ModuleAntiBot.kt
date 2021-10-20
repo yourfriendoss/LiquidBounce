@@ -22,7 +22,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                chat("${entry.gameMode}")
+                chat("${entry.gameMode} of ${entry.profile.name}")
                 if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty || isTheSamePlayer(
                         entry.profile
                     )
@@ -32,7 +32,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (isADuplicate(entry.profile)) {
                     event.cancelEvent()
-                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                    notification("AntiBot", "Removed dupe ${entry.profile.name}", NotificationEvent.Severity.INFO)
                     continue
                 }
 
@@ -54,7 +54,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                 }
 
                 world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                notification("AntiBot", "Removed bot $pName", NotificationEvent.Severity.INFO)
                 pName = null
             }
         }
