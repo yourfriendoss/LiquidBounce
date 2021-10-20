@@ -48,7 +48,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                chat("${entity.age} AGE <<<< and HURTTIME: ${entity.hurtTime}")
+                chat("${entity.age} AGE <<<< and ID: ${entity.id}")
             }
         }
     }
