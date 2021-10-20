@@ -22,7 +22,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     val packetHandler = handler<PacketEvent> { event ->
         if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
             for (entry in event.packet.entries) {
-                chat("${entry.gameMode} of ${entry.profile.name}")
                 if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty || isTheSamePlayer(
                         entry.profile
                     )
@@ -48,6 +47,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
+                chat("${entity.abilities.flying}, or ${entity.abilities.allowFlying}")
                 if (!isArmored(entity)) {
                     pName = null
                     continue
