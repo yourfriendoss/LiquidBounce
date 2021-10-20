@@ -60,14 +60,16 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
             for (entity in world.entities) {
                 if (entity is PlayerEntity && entity.entityName == pName) {
-                    if (!isArmored(entity) && entity.age > 5 && !entity.noClip) {
+                    if (!isArmored(entity)) {
                         pName = null
                         continue
                     }
 
-                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
-                    pName = null
+                    if (pName != null && entity.age <= 5 && entity.noClip) {
+                        world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                        notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                        pName = null
+                    }
                 }
             }
         }
