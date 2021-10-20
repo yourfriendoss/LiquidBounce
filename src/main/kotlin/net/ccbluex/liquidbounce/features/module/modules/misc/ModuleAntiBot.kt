@@ -47,7 +47,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
-                chat("${entity.isOnGround} or ${entity.noClip}, or ${entity.isInsideWall} or ${entity.lastAttackTime} or ${entity.lastAttackedTicks} ")
+                chat("${entity.entityName}: : : : ${entity.isOnGround} or ${entity.noClip}, or ${entity.isInsideWall} or ${entity.lastAttackTime} or ${entity.lastAttackedTicks} ")
             }
         }
     }
