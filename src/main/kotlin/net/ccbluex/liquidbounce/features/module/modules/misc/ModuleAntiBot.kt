@@ -9,6 +9,7 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
@@ -30,7 +31,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
                 if (isADuplicate(entry.profile)) {
                     event.cancelEvent()
-                    notification("AntiBot", "Removed ${entry.profile.name}", NotificationEvent.Severity.INFO)
+                    notification("AntiBot", "Removed dupe ${entry.profile.name}", NotificationEvent.Severity.INFO)
                     continue
                 }
 
@@ -44,15 +45,17 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
             return@repeatable
         }
 
+
         for (entity in world.entities) {
             if (entity is PlayerEntity && entity.entityName == pName) {
+                chat("${entity.age} AGE <<<< and HURTTIME: ${entity.hurtTime}")
                 if (!isArmored(entity)) {
                     pName = null
                     continue
                 }
 
                 world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                notification("AntiBot", "Removed bot $pName", NotificationEvent.Severity.INFO)
                 pName = null
             }
         }
