@@ -65,7 +65,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
                         continue
                     }
 
-                    if (pName != null && entity.age <= 5 && entity.noClip) {
+                    if (pName != null && entity.noClip) {
                         world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
                         notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
                         pName = null
