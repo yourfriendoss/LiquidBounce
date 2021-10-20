@@ -38,7 +38,10 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         val packetHandler = handler<PacketEvent> { event ->
             if (event.packet is PlayerListS2CPacket && event.packet.action == PlayerListS2CPacket.Action.ADD_PLAYER) {
                 for (entry in event.packet.entries) {
-                    if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty || isTheSamePlayer(entry.profile)) {
+                    if (entry.latency < 2 || entry.profile.name.length < 3 || !entry.profile.properties.isEmpty || isTheSamePlayer(
+                            entry.profile
+                        )
+                    ) {
                         continue
                     }
 
@@ -60,16 +63,14 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
             for (entity in world.entities) {
                 if (entity is PlayerEntity && entity.entityName == pName) {
-                    if (!isArmored(entity)) {
+                    if (!isArmored(entity) && entity.age > 5 && !entity.noClip) {
                         pName = null
                         continue
                     }
 
-                    if (pName != null && entity.noClip) {
-                        world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
-                        notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
-                        pName = null
-                    }
+                    world.removeEntity(entity.id, Entity.RemovalReason.DISCARDED)
+                    notification("AntiBot", "Removed $pName", NotificationEvent.Severity.INFO)
+                    pName = null
                 }
             }
         }
