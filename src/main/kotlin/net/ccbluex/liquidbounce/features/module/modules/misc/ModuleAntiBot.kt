@@ -60,7 +60,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
             for (entity in world.entities) {
                 if (entity is PlayerEntity && entity.entityName == pName) {
-                    if (!isArmored(entity) && entity.age <= 1 && !entity.noClip) {
+                    if (!isArmored(entity) && entity.age > 5 && !entity.noClip) {
                         pName = null
                         continue
                     }
