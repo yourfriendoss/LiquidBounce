@@ -1,5 +1,3 @@
-@file:Suppress("ReplaceSizeCheckWithIsNotEmpty")
-
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
 import com.mojang.authlib.GameProfile
@@ -76,7 +74,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
 
         private fun isADuplicate(profile: GameProfile): Boolean {
-            return network.playerList.count { it.profile.name == profile.name } > 0
+            return network.playerList.count { it.profile.name == profile.name } == 1
         }
 
         private fun isArmored(entity: PlayerEntity): Boolean {
@@ -88,7 +86,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
         private fun isTheSamePlayer(profile: GameProfile): Boolean {
             // Prevents false positives when a player joins a minigame such as Practice
-            return network.playerList.count { it.profile.name == profile.name && it.profile.id == profile.id } > 0
+            return network.playerList.count { it.profile.name == profile.name && it.profile.id == profile.id } == 1
         }
     }
 }
