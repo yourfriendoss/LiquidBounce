@@ -9,7 +9,6 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.notification
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
@@ -30,7 +29,6 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
     }
 
     private object Matrix : Choice("Matrix") {
-
         override val parent: ChoiceConfigurable
             get() = modes
 
@@ -62,8 +60,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
 
             for (entity in world.entities) {
                 if (entity is PlayerEntity && entity.entityName == pName) {
-                    chat("${entity.uuid}, ${entity.age}")
-                    if (!isArmored(entity) && entity.age != 0) {
+                    if (!isArmored(entity)) {
                         pName = null
                         continue
                     }
@@ -76,7 +73,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
 
         private fun isADuplicate(profile: GameProfile): Boolean {
-            return network.playerList.count { it.profile.name == profile.name } == 1
+            return !isTheSamePlayer(profile) && network.playerList.count { it.profile.name == profile.name && it.profile.id != profile.id } == 1
         }
 
         private fun isArmored(entity: PlayerEntity): Boolean {
