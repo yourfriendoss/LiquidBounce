@@ -76,7 +76,7 @@ object ModuleAntiBot : Module("AntiBot", Category.MISC) {
         }
 
         private fun isADuplicate(profile: GameProfile): Boolean {
-            return network.playerList.count { it.profile.name == profile.name && it.profile.id != profile.id } == 1
+            return network.playerList.count { it.profile.name == profile.name } == 1
         }
 
         private fun isArmored(entity: PlayerEntity): Boolean {
