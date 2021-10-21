@@ -99,8 +99,8 @@ fun BlockPos.canStandOn(): Boolean {
  * Check if [box] is reaching of specified blocks
  */
 fun isBlockAtPosition(box: Box, isCorrectBlock: (Block?) -> Boolean): Boolean {
-    for (x in MathHelper.floor(box.minX) until MathHelper.floor(box.maxX)) {
-        for (z in MathHelper.floor(box.minZ) until MathHelper.floor(box.maxZ)) {
+    for (x in MathHelper.floor(box.minX) until MathHelper.floor(box.maxX) + 1) {
+        for (z in MathHelper.floor(box.minZ) until MathHelper.floor(box.maxZ) + 1) {
             val block = BlockPos(x.toDouble(), box.minY, z.toDouble()).getBlock()
 
             if (isCorrectBlock(block)) {
