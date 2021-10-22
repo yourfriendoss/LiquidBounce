@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ nextgen ]
+    branches: [ patch-2 ]
   pull_request:
-    branches: [ nextgen ]
+    branches: [ patch-2 ]
 
 jobs:
   build:
